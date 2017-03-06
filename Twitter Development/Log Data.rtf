@@ -1,0 +1,752 @@
+Tweet Log showing errors
+
+{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf460
+{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;}
+{\colortbl;\red255\green255\blue255;}
+\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs22 \cf0 \CocoaLigature0 ***** Error tweeting: Will Rogers Says: "Ammunition beats persuasion when you are looking for freedom." #toct #quote  -----> 500 -----> Can't connect to api.twitter.com:443 -----> 500 Can't connect to api.twitter.com:443 at tweet-dev.pl line 131\
+***** Error tweeting: Frances the cat won't admit! RT @Crazy_Felix: "The cat could very well be man's best friend but would never stoop to admitting it."-DLarson  -----> 500 -----> Can't connect to api.twitter.com:443 -----> 500 Can't connect to api.twitter.com:443 at tweet-dev.pl line 146\
+***** Error tweeting: Oklahoma and Texas have an original primary system ... #WillRogers #quote #QOTD  -----> 500 -----> Can't connect to api.twitter.com:443 -----> 500 Can't connect to api.twitter.com:443 at tweet-dev.pl line 131\
+***** Error tweeting: Put your destiny in God's hands! Let Him control. RT @MurrayMelb: Control your own destiny or someone else will. - Jack Welch. #quote\
+ -----> 500 -----> Can't connect to api.twitter.com:443 -----> 500 Can't connect to api.twitter.com:443 at tweet-dev.pl line 146\
+***** Error tweeting: @BoLumpkin: @FBRASWELL Redneck Mama threats "I'll slap you nekkid and hide your clothes." ~ Southern Saying  -----> 500 -----> Can't connect to api.twitter.com:443 -----> 500 Can't connect to api.twitter.com:443 at tweet-dev.pl line 131\
+***** Error tweeting: Special devotional: Precious thought-> http://bit.ly/eBjCk4 and music by Sons of Korah\
+ -----> 500 -----> Can't connect to api.twitter.com:443 -----> 500 Can't connect to api.twitter.com:443 at tweet-dev.pl line 146\
+***** Error tweeting: the man who sighs after God, that is the blessed man #Spurgeon #quote #Jesus  -----> 500 -----> Can't connect to api.twitter.com:443 -----> 500 Can't connect to api.twitter.com:443 at tweet-dev.pl line 131\
+***** Error tweeting: Course there is one thing about Europe. You can never believe 'em the first time ... http://bit.ly/SOMa-Will  -----> 500 -----> Can't connect to api.twitter.com:443 -----> 500 Can't connect to api.twitter.com:443 at tweet-dev.pl line 131\
+\
+}
+
+
+Different types of Twitter rate limits
+Dump rate limit result1: 
+$VAR1 = {
+  'resources' => {
+                   'live_pipeline' => {
+                                        '/live_pipeline/events' => {
+                                                                     'remaining' => 180,
+                                                                     'reset' => 1468188455,
+                                                                     'limit' => 180
+                                                                   }
+                                      },
+                   'trends' => {
+                                 '/trends/available' => {
+                                                          'reset' => 1468188455,
+                                                          'remaining' => 15,
+                                                          'limit' => 15
+                                                        },
+                                 '/trends/closest' => {
+                                                        'remaining' => 15,
+                                                        'reset' => 1468188455,
+                                                        'limit' => 15
+                                                      },
+                                 '/trends/place' => {
+                                                      'limit' => 15,
+                                                      'reset' => 1468188455,
+                                                      'remaining' => 15
+                                                    }
+                               },
+                   'direct_messages' => {
+                                          '/direct_messages' => {
+                                                                  'limit' => 300,
+                                                                  'reset' => 1468188455,
+                                                                  'remaining' => 300
+                                                                },
+                                          '/direct_messages/sent' => {
+                                                                       'reset' => 1468188455,
+                                                                       'remaining' => 300,
+                                                                       'limit' => 300
+                                                                     },
+                                          '/direct_messages/sent_and_received' => {
+                                                                                    'remaining' => 300,
+                                                                                    'reset' => 1468188455,
+                                                                                    'limit' => 300
+                                                                                  },
+                                          '/direct_messages/show' => {
+                                                                       'reset' => 1468188455,
+                                                                       'remaining' => 300,
+                                                                       'limit' => 300
+                                                                     }
+                                        },
+                   'friends' => {
+                                  '/friends/ids' => {
+                                                      'limit' => 15,
+                                                      'reset' => 1468188455,
+                                                      'remaining' => 15
+                                                    },
+                                  '/friends/following/ids' => {
+                                                                'limit' => 15,
+                                                                'remaining' => 15,
+                                                                'reset' => 1468188455
+                                                              },
+                                  '/friends/list' => {
+                                                       'remaining' => 15,
+                                                       'reset' => 1468188455,
+                                                       'limit' => 15
+                                                     },
+                                  '/friends/following/list' => {
+                                                                 'limit' => 15,
+                                                                 'reset' => 1468188455,
+                                                                 'remaining' => 15
+                                                               }
+                                },
+                   'application' => {
+                                      '/application/rate_limit_status' => {
+                                                                            'reset' => 1468187582,
+                                                                            'remaining' => 173,
+                                                                            'limit' => 180
+                                                                          }
+                                    },
+                   'account' => {
+                                  '/account/settings' => {
+                                                           'reset' => 1468188455,
+                                                           'remaining' => 15,
+                                                           'limit' => 15
+                                                         },
+                                  '/account/update_profile' => {
+                                                                 'reset' => 1468188455,
+                                                                 'remaining' => 15,
+                                                                 'limit' => 15
+                                                               },
+                                  '/account/login_verification_enrollment' => {
+                                                                                'remaining' => 15,
+                                                                                'reset' => 1468188455,
+                                                                                'limit' => 15
+                                                                              },
+                                  '/account/verify_credentials' => {
+                                                                     'limit' => 15,
+                                                                     'remaining' => 15,
+                                                                     'reset' => 1468188455
+                                                                   }
+                                },
+                   'tweet_prompts' => {
+                                        '/tweet_prompts/report_interaction' => {
+                                                                                 'limit' => 180,
+                                                                                 'remaining' => 180,
+                                                                                 'reset' => 1468188455
+                                                                               },
+                                        '/tweet_prompts/show' => {
+                                                                   'reset' => 1468188455,
+                                                                   'remaining' => 180,
+                                                                   'limit' => 180
+                                                                 }
+                                      },
+                   'geo' => {
+                              '/geo/reverse_geocode' => {
+                                                          'reset' => 1468188455,
+                                                          'remaining' => 15,
+                                                          'limit' => 15
+                                                        },
+                              '/geo/search' => {
+                                                 'reset' => 1468188455,
+                                                 'remaining' => 15,
+                                                 'limit' => 15
+                                               },
+                              '/geo/id/:place_id' => {
+                                                       'limit' => 15,
+                                                       'reset' => 1468188455,
+                                                       'remaining' => 15
+                                                     },
+                              '/geo/similar_places' => {
+                                                         'limit' => 15,
+                                                         'remaining' => 15,
+                                                         'reset' => 1468188455
+                                                       }
+                            },
+                   'business_experience' => {
+                                              '/business_experience/dashboard_features' => {
+                                                                                             'limit' => 450,
+                                                                                             'remaining' => 450,
+                                                                                             'reset' => 1468188455
+                                                                                           },
+                                              '/business_experience/keywords' => {
+                                                                                   'limit' => 450,
+                                                                                   'reset' => 1468188455,
+                                                                                   'remaining' => 450
+                                                                                 },
+                                              '/business_experience/dashboard_settings/update' => {
+                                                                                                    'limit' => 450,
+                                                                                                    'remaining' => 450,
+                                                                                                    'reset' => 1468188455
+                                                                                                  },
+                                              '/business_experience/dashboard_settings/destroy' => {
+                                                                                                     'remaining' => 450,
+                                                                                                     'reset' => 1468188455,
+                                                                                                     'limit' => 450
+                                                                                                   },
+                                              '/business_experience/dashboard_settings/show' => {
+                                                                                                  'remaining' => 450,
+                                                                                                  'reset' => 1468188455,
+                                                                                                  'limit' => 450
+                                                                                                }
+                                            },
+                   'contacts' => {
+                                   '/contacts/users_and_uploaded_by' => {
+                                                                          'limit' => 300,
+                                                                          'reset' => 1468188455,
+                                                                          'remaining' => 300
+                                                                        },
+                                   '/contacts/uploaded_by' => {
+                                                                'limit' => 300,
+                                                                'remaining' => 300,
+                                                                'reset' => 1468188455
+                                                              },
+                                   '/contacts/delete/status' => {
+                                                                  'limit' => 300,
+                                                                  'remaining' => 300,
+                                                                  'reset' => 1468188455
+                                                                },
+                                   '/contacts/addressbook' => {
+                                                                'limit' => 300,
+                                                                'reset' => 1468188455,
+                                                                'remaining' => 300
+                                                              },
+                                   '/contacts/users' => {
+                                                          'limit' => 300,
+                                                          'reset' => 1468188455,
+                                                          'remaining' => 300
+                                                        }
+                                 },
+                   'statuses' => {
+                                   '/statuses/oembed' => {
+                                                           'reset' => 1468188455,
+                                                           'remaining' => 180,
+                                                           'limit' => 180
+                                                         },
+                                   '/statuses/home_timeline' => {
+                                                                  'limit' => 15,
+                                                                  'remaining' => 15,
+                                                                  'reset' => 1468188455
+                                                                },
+                                   '/statuses/show/:id' => {
+                                                             'limit' => 180,
+                                                             'remaining' => 180,
+                                                             'reset' => 1468188455
+                                                           },
+                                   '/statuses/user_timeline' => {
+                                                                  'reset' => 1468188455,
+                                                                  'remaining' => 180,
+                                                                  'limit' => 180
+                                                                },
+                                   '/statuses/friends' => {
+                                                            'limit' => 15,
+                                                            'remaining' => 15,
+                                                            'reset' => 1468188455
+                                                          },
+                                   '/statuses/mentions_timeline' => {
+                                                                      'limit' => 15,
+                                                                      'remaining' => 15,
+                                                                      'reset' => 1468188455
+                                                                    },
+                                   '/statuses/retweets/:id' => {
+                                                                 'limit' => 60,
+                                                                 'remaining' => 60,
+                                                                 'reset' => 1468188455
+                                                               },
+                                   '/statuses/retweeters/ids' => {
+                                                                   'limit' => 15,
+                                                                   'reset' => 1468188455,
+                                                                   'remaining' => 15
+                                                                 },
+                                   '/statuses/retweets_of_me' => {
+                                                                   'reset' => 1468188455,
+                                                                   'remaining' => 15,
+                                                                   'limit' => 15
+                                                                 },
+                                   '/statuses/lookup' => {
+                                                           'limit' => 180,
+                                                           'remaining' => 180,
+                                                           'reset' => 1468188455
+                                                         }
+                                 },
+                   'auth' => {
+                               '/auth/csrf_token' => {
+                                                       'limit' => 15,
+                                                       'reset' => 1468188455,
+                                                       'remaining' => 15
+                                                     }
+                             },
+                   'search' => {
+                                 '/search/tweets' => {
+                                                       'reset' => 1468188455,
+                                                       'remaining' => 180,
+                                                       'limit' => 180
+                                                     }
+                               },
+                   'blocks' => {
+                                 '/blocks/ids' => {
+                                                    'limit' => 15,
+                                                    'remaining' => 15,
+                                                    'reset' => 1468188455
+                                                  },
+                                 '/blocks/list' => {
+                                                     'limit' => 15,
+                                                     'remaining' => 15,
+                                                     'reset' => 1468188455
+                                                   }
+                               },
+                   'favorites' => {
+                                    '/favorites/list' => {
+                                                           'limit' => 15,
+                                                           'reset' => 1468188455,
+                                                           'remaining' => 15
+                                                         }
+                                  },
+                   'mutes' => {
+                                '/mutes/users/ids' => {
+                                                        'limit' => 15,
+                                                        'reset' => 1468188455,
+                                                        'remaining' => 15
+                                                      },
+                                '/mutes/users/list' => {
+                                                         'reset' => 1468188455,
+                                                         'remaining' => 15,
+                                                         'limit' => 15
+                                                       }
+                              },
+                   'moments' => {
+                                  '/moments/permissions' => {
+                                                              'limit' => 300,
+                                                              'remaining' => 300,
+                                                              'reset' => 1468188455
+                                                            }
+                                },
+                   'friendships' => {
+                                      '/friendships/show' => {
+                                                               'remaining' => 180,
+                                                               'reset' => 1468188455,
+                                                               'limit' => 180
+                                                             },
+                                      '/friendships/incoming' => {
+                                                                   'remaining' => 15,
+                                                                   'reset' => 1468188455,
+                                                                   'limit' => 15
+                                                                 },
+                                      '/friendships/outgoing' => {
+                                                                   'reset' => 1468188455,
+                                                                   'remaining' => 15,
+                                                                   'limit' => 15
+                                                                 },
+                                      '/friendships/lookup' => {
+                                                                 'reset' => 1468188455,
+                                                                 'remaining' => 15,
+                                                                 'limit' => 15
+                                                               },
+                                      '/friendships/list' => {
+                                                               'limit' => 200,
+                                                               'reset' => 1468188455,
+                                                               'remaining' => 200
+                                                             },
+                                      '/friendships/no_retweets/ids' => {
+                                                                          'remaining' => 15,
+                                                                          'reset' => 1468188455,
+                                                                          'limit' => 15
+                                                                        }
+                                    },
+                   'help' => {
+                               '/help/settings' => {
+                                                     'limit' => 15,
+                                                     'remaining' => 15,
+                                                     'reset' => 1468188455
+                                                   },
+                               '/help/configuration' => {
+                                                          'remaining' => 15,
+                                                          'reset' => 1468188455,
+                                                          'limit' => 15
+                                                        },
+                               '/help/tos' => {
+                                                'limit' => 15,
+                                                'reset' => 1468188455,
+                                                'remaining' => 15
+                                              },
+                               '/help/privacy' => {
+                                                    'limit' => 15,
+                                                    'reset' => 1468188455,
+                                                    'remaining' => 15
+                                                  },
+                               '/help/languages' => {
+                                                      'reset' => 1468188455,
+                                                      'remaining' => 15,
+                                                      'limit' => 15
+                                                    }
+                             },
+                   'saved_searches' => {
+                                         '/saved_searches/destroy/:id' => {
+                                                                            'limit' => 15,
+                                                                            'remaining' => 15,
+                                                                            'reset' => 1468188455
+                                                                          },
+                                         '/saved_searches/show/:id' => {
+                                                                         'limit' => 15,
+                                                                         'reset' => 1468188455,
+                                                                         'remaining' => 15
+                                                                       },
+                                         '/saved_searches/list' => {
+                                                                     'limit' => 15,
+                                                                     'remaining' => 15,
+                                                                     'reset' => 1468188455
+                                                                   }
+                                       },
+                   'media' => {
+                                '/media/upload' => {
+                                                     'limit' => 500,
+                                                     'remaining' => 500,
+                                                     'reset' => 1468188455
+                                                   }
+                              },
+                   'collections' => {
+                                      '/collections/list' => {
+                                                               'reset' => 1468188455,
+                                                               'remaining' => 1000,
+                                                               'limit' => 1000
+                                                             },
+                                      '/collections/entries' => {
+                                                                  'remaining' => 1000,
+                                                                  'reset' => 1468188455,
+                                                                  'limit' => 1000
+                                                                },
+                                      '/collections/show' => {
+                                                               'reset' => 1468188455,
+                                                               'remaining' => 1000,
+                                                               'limit' => 1000
+                                                             }
+                                    },
+                   'users' => {
+                                '/users/search' => {
+                                                     'remaining' => 180,
+                                                     'reset' => 1468188455,
+                                                     'limit' => 180
+                                                   },
+                                '/users/show/:id' => {
+                                                       'limit' => 181,
+                                                       'reset' => 1468188455,
+                                                       'remaining' => 181
+                                                     },
+                                '/users/lookup' => {
+                                                     'reset' => 1468187582,
+                                                     'remaining' => 175,
+                                                     'limit' => 180
+                                                   },
+                                '/users/suggestions' => {
+                                                          'reset' => 1468188455,
+                                                          'remaining' => 15,
+                                                          'limit' => 15
+                                                        },
+                                '/users/report_spam' => {
+                                                          'reset' => 1468188455,
+                                                          'remaining' => 15,
+                                                          'limit' => 15
+                                                        },
+                                '/users/profile_banner' => {
+                                                             'remaining' => 180,
+                                                             'reset' => 1468188455,
+                                                             'limit' => 180
+                                                           },
+                                '/users/suggestions/:slug' => {
+                                                                'limit' => 15,
+                                                                'reset' => 1468188455,
+                                                                'remaining' => 15
+                                                              },
+                                '/users/derived_info' => {
+                                                           'remaining' => 15,
+                                                           'reset' => 1468188455,
+                                                           'limit' => 15
+                                                         },
+                                '/users/suggestions/:slug/members' => {
+                                                                        'reset' => 1468188455,
+                                                                        'remaining' => 15,
+                                                                        'limit' => 15
+                                                                      }
+                              },
+                   'lists' => {
+                                '/lists/members/show' => {
+                                                           'limit' => 15,
+                                                           'remaining' => 15,
+                                                           'reset' => 1468188455
+                                                         },
+                                '/lists/list' => {
+                                                   'limit' => 15,
+                                                   'reset' => 1468188455,
+                                                   'remaining' => 15
+                                                 },
+                                '/lists/subscribers' => {
+                                                          'limit' => 180,
+                                                          'reset' => 1468188455,
+                                                          'remaining' => 180
+                                                        },
+                                '/lists/show' => {
+                                                   'limit' => 15,
+                                                   'remaining' => 15,
+                                                   'reset' => 1468188455
+                                                 },
+                                '/lists/ownerships' => {
+                                                         'remaining' => 15,
+                                                         'reset' => 1468188455,
+                                                         'limit' => 15
+                                                       },
+                                '/lists/memberships' => {
+                                                          'reset' => 1468188455,
+                                                          'remaining' => 15,
+                                                          'limit' => 15
+                                                        },
+                                '/lists/subscriptions' => {
+                                                            'remaining' => 15,
+                                                            'reset' => 1468188455,
+                                                            'limit' => 15
+                                                          },
+                                '/lists/statuses' => {
+                                                       'limit' => 180,
+                                                       'remaining' => 180,
+                                                       'reset' => 1468188455
+                                                     },
+                                '/lists/members' => {
+                                                      'remaining' => 180,
+                                                      'reset' => 1468188455,
+                                                      'limit' => 180
+                                                    },
+                                '/lists/subscribers/show' => {
+                                                               'remaining' => 15,
+                                                               'reset' => 1468188455,
+                                                               'limit' => 15
+                                                             }
+                              },
+                   'device' => {
+                                 '/device/token' => {
+                                                      'remaining' => 15,
+                                                      'reset' => 1468188455,
+                                                      'limit' => 15
+                                                    }
+                               },
+                   'followers' => {
+                                    '/followers/list' => {
+                                                           'reset' => 1468188455,
+                                                           'remaining' => 15,
+                                                           'limit' => 15
+                                                         },
+                                    '/followers/ids' => {
+                                                          'limit' => 15,
+                                                          'remaining' => 0,
+                                                          'reset' => 1468187582
+                                                        }
+                                  },
+                   'feedback' => {
+                                   '/feedback/events' => {
+                                                           'reset' => 1468188455,
+                                                           'remaining' => 1000,
+                                                           'limit' => 1000
+                                                         },
+                                   '/feedback/show/:id' => {
+                                                             'reset' => 1468188455,
+                                                             'remaining' => 180,
+                                                             'limit' => 180
+                                                           }
+                                 }
+                 },
+  'rate_limit_context' => {
+                            'access_token' => '65664359-C7asxBNAN6HVO6o8MNVo8ZLq0TZScNgG5I3YH39ua'
+                          }
+};
+
+stop here! at ./REST-test.pl line 92.
+
+
+
+
+-Dump FBRASWELL info: $VAR1 = {
+          'name' => 'Frank Braswell',
+          'description' => 'Entrepreneur, iPhone App Developer and Marketer, Conservative, Father of 8, Purveyor of Inspirational Quotes, Also on Facebook & LinkedIn.',
+          'favourites_count' => 154,
+          'statuses_count' => 343372,
+          'profile_text_color' => '333333',
+          'profile_location' => undef,
+          'followers_count' => 57732,
+          'profile_background_tile' => bless( do{\(my $o = 0)}, 'JSON::PP::Boolean' ),
+          'has_extended_profile' => $VAR1->{'profile_background_tile'},
+          'needs_phone_verification' => $VAR1->{'profile_background_tile'},
+          'contributors_enabled' => $VAR1->{'profile_background_tile'},
+          'created_at' => 'Fri Aug 14 15:48:06 +0000 2009',
+          'profile_background_image_url' => 'http://pbs.twimg.com/profile_background_images/243116689/stars-bkgnd2.jpg',
+          'profile_use_background_image' => bless( do{\(my $o = 1)}, 'JSON::PP::Boolean' ),
+          'status' => {
+                        'lang' => 'en',
+                        'in_reply_to_screen_name' => undef,
+                        'is_quote_status' => $VAR1->{'profile_background_tile'},
+                        'in_reply_to_status_id_str' => undef,
+                        'contributors' => undef,
+                        'id' => '753229197510860800',
+                        'truncated' => $VAR1->{'profile_background_tile'},
+                        'possibly_sensitive' => $VAR1->{'profile_background_tile'},
+                        'retweet_count' => 0,
+                        'retweeted' => $VAR1->{'profile_background_tile'},
+                        'created_at' => 'Wed Jul 13 14:06:49 +0000 2016',
+                        'in_reply_to_status_id' => undef,
+                        'entities' => {
+                                        'user_mentions' => [],
+                                        'hashtags' => [
+                                                        {
+                                                          'text' => 'WillRogers',
+                                                          'indices' => [
+                                                                         74,
+                                                                         85
+                                                                       ]
+                                                        },
+                                                        {
+                                                          'text' => 'quote',
+                                                          'indices' => [
+                                                                         86,
+                                                                         92
+                                                                       ]
+                                                        },
+                                                        {
+                                                          'text' => 'QOTD',
+                                                          'indices' => [
+                                                                         93,
+                                                                         98
+                                                                       ]
+                                                        }
+                                                      ],
+                                        'media' => [
+                                                     {
+                                                       'expanded_url' => 'http://twitter.com/FBRASWELL/status/753229197510860800/photo/1',
+                                                       'url' => 'https://t.co/J0jzXOff68',
+                                                       'id' => '753229195006906368',
+                                                       'id_str' => '753229195006906368',
+                                                       'indices' => [
+                                                                      99,
+                                                                      122
+                                                                    ],
+                                                       'media_url' => 'http://pbs.twimg.com/media/CnQB9krXEAAmJ2W.jpg',
+                                                       'media_url_https' => 'https://pbs.twimg.com/media/CnQB9krXEAAmJ2W.jpg',
+                                                       'display_url' => 'pic.twitter.com/J0jzXOff68',
+                                                       'type' => 'photo',
+                                                       'sizes' => {
+                                                                    'thumb' => {
+                                                                                 'w' => 150,
+                                                                                 'h' => 150,
+                                                                                 'resize' => 'crop'
+                                                                               },
+                                                                    'large' => {
+                                                                                 'w' => 1024,
+                                                                                 'h' => 512,
+                                                                                 'resize' => 'fit'
+                                                                               },
+                                                                    'small' => {
+                                                                                 'w' => 680,
+                                                                                 'resize' => 'fit',
+                                                                                 'h' => 340
+                                                                               },
+                                                                    'medium' => {
+                                                                                  'w' => 1024,
+                                                                                  'h' => 512,
+                                                                                  'resize' => 'fit'
+                                                                                }
+                                                                  }
+                                                     }
+                                                   ],
+                                        'symbols' => [],
+                                        'urls' => []
+                                      },
+                        'source' => '<a href="http://tinyurl.com/pdqkjv" rel="nofollow">Psalm Daily Quotes KJV</a>',
+                        'id_str' => '753229197510860800',
+                        'text' => 'The worst thing that has happened to us is that this is an election year. #WillRogers #quote #QOTD https://t.co/J0jzXOff68',
+                        'extended_entities' => {
+                                                 'media' => [
+                                                              {
+                                                                'id_str' => '753229195006906368',
+                                                                'id' => '753229195006906368',
+                                                                'indices' => [
+                                                                               99,
+                                                                               122
+                                                                             ],
+                                                                'media_url' => 'http://pbs.twimg.com/media/CnQB9krXEAAmJ2W.jpg',
+                                                                'media_url_https' => 'https://pbs.twimg.com/media/CnQB9krXEAAmJ2W.jpg',
+                                                                'url' => 'https://t.co/J0jzXOff68',
+                                                                'expanded_url' => 'http://twitter.com/FBRASWELL/status/753229197510860800/photo/1',
+                                                                'type' => 'photo',
+                                                                'sizes' => {
+                                                                             'thumb' => {
+                                                                                          'w' => 150,
+                                                                                          'resize' => 'crop',
+                                                                                          'h' => 150
+                                                                                        },
+                                                                             'medium' => {
+                                                                                           'w' => 1024,
+                                                                                           'h' => 512,
+                                                                                           'resize' => 'fit'
+                                                                                         },
+                                                                             'small' => {
+                                                                                          'h' => 340,
+                                                                                          'resize' => 'fit',
+                                                                                          'w' => 680
+                                                                                        },
+                                                                             'large' => {
+                                                                                          'w' => 1024,
+                                                                                          'h' => 512,
+                                                                                          'resize' => 'fit'
+                                                                                        }
+                                                                           },
+                                                                'display_url' => 'pic.twitter.com/J0jzXOff68',
+                                                                'ext_alt_text' => undef
+                                                              }
+                                                            ]
+                                               },
+                        'favorite_count' => 0,
+                        'geo' => undef,
+                        'in_reply_to_user_id' => undef,
+                        'place' => undef,
+                        'favorited' => $VAR1->{'profile_background_tile'},
+                        'in_reply_to_user_id_str' => undef,
+                        'coordinates' => undef
+                      },
+          'verified' => $VAR1->{'profile_background_tile'},
+          'profile_banner_url' => 'https://pbs.twimg.com/profile_banners/65664359/1356193477',
+          'default_profile_image' => $VAR1->{'profile_background_tile'},
+          'profile_background_image_url_https' => 'https://pbs.twimg.com/profile_background_images/243116689/stars-bkgnd2.jpg',
+          'suspended' => $VAR1->{'profile_background_tile'},
+          'listed_count' => 869,
+          'default_profile' => $VAR1->{'profile_background_tile'},
+          'friends_count' => 63427,
+          'id_str' => '65664359',
+          'utc_offset' => -14400,
+          'profile_sidebar_border_color' => 'A8C7F7',
+          'profile_image_url' => 'http://pbs.twimg.com/profile_images/684811531981205505/8XUuB3bE_normal.jpg',
+          'profile_sidebar_fill_color' => 'C0DFEC',
+          'time_zone' => 'Eastern Time (US & Canada)',
+          'lang' => 'en',
+          'protected' => $VAR1->{'profile_background_tile'},
+          'profile_link_color' => '0084B4',
+          'screen_name' => 'FBRASWELL',
+          'id' => 65664359,
+          'notifications' => $VAR1->{'profile_background_tile'},
+          'profile_background_color' => '022330',
+          'url' => 'http://t.co/coSjsDLEql',
+          'is_translator' => $VAR1->{'profile_background_tile'},
+          'profile_image_url_https' => 'https://pbs.twimg.com/profile_images/684811531981205505/8XUuB3bE_normal.jpg',
+          'following' => $VAR1->{'profile_background_tile'},
+          'is_translation_enabled' => $VAR1->{'profile_background_tile'},
+          'location' => 'Indiana',
+          'geo_enabled' => $VAR1->{'profile_background_tile'},
+          'entities' => {
+                          'description' => {
+                                             'urls' => []
+                                           },
+                          'url' => {
+                                     'urls' => [
+                                                 {
+                                                   'display_url' => 'systemsofmerritt.com/wordpress/',
+                                                   'expanded_url' => 'http://systemsofmerritt.com/wordpress/',
+                                                   'indices' => [
+                                                                  0,
+                                                                  22
+                                                                ],
+                                                   'url' => 'http://t.co/coSjsDLEql'
+                                                 }
+                                               ]
+                                   }
+                        },
+          'follow_request_sent' => $VAR1->{'profile_background_tile'}
+        };
+
+stop here! at ./REST-test.pl line 95.

@@ -18,6 +18,7 @@ use JSON;
 
 print "\n*********************************** start program $0  program.***********************************\n";
 
+my @mpn = ( "2n7000" );
 # Open needed files
 
 #	my $FHTfriends; # file handle
@@ -54,16 +55,27 @@ my $octopart = REST::Client->new({
 
 });
 
+my $part = $mpn[0];
+
 $octopart->buildQuery({'pretty_print'=>'true'});
 # $octopart->GET('/api/v3/parts/match?apikey=4ed77e1e&queries=[{"mpn":"2n7000"}]&pretty_print=true');
-$octopart->GET('/api/v3/parts/match?apikey=4ed77e1e&queries=[{"mpn":"2n7000"}]');
+$octopart->GET("/api/v3/parts/match?apikey=4ed77e1e&queries=[{\"mpn\":\"$part\"}]");
 # $octopart->GET('/api/v3/parts/match', {'apikey' => '4ed77e1e'});
 # $octopart->request('GET', 'http://octopart.com/api/v3/parts/match', 'request body content');
-print "\nStart responseCode: ";
-print $octopart->responseCode();
-print "\nStart responseContent\n";
-print $octopart->responseContent();
-print "\nEnd responseContent\n";
+print "\nStart responseCode: ", $octopart->responseCode(), "\n";
+# print $octopart->responseCode();
+#    print "\nStart responseContent\n";
+#    print $octopart->responseContent();
+#    print "\nEnd responseContent\n";
+
+my $json = JSON->new->allow_nonref;
+my $jsonDecode = $json->decode($octopart->responseContent());
+
+print "millisec: ", $jsonDecode->{"msec"}, "\n";
+print "CLASS: ", $jsonDecode->{"__class__"}, "\n";
+print "Request: ", $jsonDecode->{"request"}->{"__class__"}, "\n";
+print "Request for mpn: ", $jsonDecode->{"request"}->{"queries"}[0]->{"mpn"}, "\n";
+print "Results: ", $jsonDecode->{"results"}[0]->{"__class__"}, "\n";
 # Test cases
 
 #     screen name: FBRASWELL,  id string: 65664359

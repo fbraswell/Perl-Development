@@ -1,5 +1,5 @@
 # Twitter Tweet Automation
-while [ 1 ] # Infinite Loop Here
+while [ 1 ] # Infinite Loop
 do
 echo "================== Create Tweet Set =================="
 ./tweet-build-dev.pl

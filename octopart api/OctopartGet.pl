@@ -8,6 +8,8 @@ use warnings;
 
 use LWP::Simple;
 use Data::Dumper;
+# use utf8;
+binmode STDOUT, ":utf8"; # get rid of warnings about special characters
 
 # use Scalar::Util 'blessed';
 # use JSON qw( decode_json );
@@ -16,9 +18,9 @@ use Data::Dumper;
 use REST::Client;
 use JSON;
 
-print "\n*********************************** start program $0  program.***********************************\n";
+print "\n*********************************** start program $0 program.***********************************\n";
 
-my @mpn = ( "2n7000" );
+my @mpn = ( "1n4148" );
 # Open needed files
 
 #	my $FHTfriends; # file handle
@@ -59,10 +61,17 @@ my $part = $mpn[0];
 
 $octopart->buildQuery({'pretty_print'=>'true'});
 # $octopart->GET('/api/v3/parts/match?apikey=4ed77e1e&queries=[{"mpn":"2n7000"}]&pretty_print=true');
-$octopart->GET("/api/v3/parts/match?apikey=4ed77e1e&queries=[{\"mpn\":\"$part\"}]");
+# $octopart->GET("/api/v3/parts/match?apikey=4ed77e1e&queries=[{\"mpn\":\"$part\"}]");
+$octopart->GET('/api/v3/parts/match'
+                . '?' . 'apikey=4ed77e1e'
+                . '&' . "queries=[{\"mpn\":\"$part\"}]"
+                . '&' . 'include[]=descriptions'
+                . '&' . 'include[]=specs'
+ #               . '&' . 'pretty_print=true'
+                );
 # $octopart->GET('/api/v3/parts/match', {'apikey' => '4ed77e1e'});
 # $octopart->request('GET', 'http://octopart.com/api/v3/parts/match', 'request body content');
-print "\nStart responseCode: ", $octopart->responseCode(), "\n";
+print "\nHTTP request responseCode: ", $octopart->responseCode(), "\n";
 # print $octopart->responseCode();
 #    print "\nStart responseContent\n";
 #    print $octopart->responseContent();
@@ -71,60 +80,82 @@ print "\nStart responseCode: ", $octopart->responseCode(), "\n";
 my $json = JSON->new->allow_nonref;
 my $jsonDecode = $json->decode($octopart->responseContent());
 
-print "millisec: ", $jsonDecode->{"msec"}, "\n";
-print "CLASS: ", $jsonDecode->{"__class__"}, "\n";
-print "Request: ", $jsonDecode->{"request"}->{"__class__"}, "\n";
-print "Request for mpn: ", $jsonDecode->{"request"}->{"queries"}[0]->{"mpn"}, "\n";
-print "Results: ", $jsonDecode->{"results"}[0]->{"__class__"}, "\n";
-# Test cases
+my $PartsMatchResponse = $jsonDecode; # top level information
 
-#     screen name: FBRASWELL,  id string: 65664359
-#     friends: 63343
-#     statuses: 342954
-#     followers: 57605
+#    print "millisec: ", $jsonDecode->{"msec"}, "\n";
+#    print "CLASS: ", $jsonDecode->{"__class__"}, "\n";
 
-#    screen name: Ber97Luke, id string: 4854560182
-#    friends: 819
-#    followers: 838
+# print "millisec: ", $PartsMatchResponse->{"msec"}, "\n";
+printResult("millisec: ", $PartsMatchResponse->{"msec"});
+# print "CLASS: ", $PartsMatchResponse->{"__class__"}, "\n";
+printResult("CLASS: ", $PartsMatchResponse->{"__class__"});
 
-# loadJSON('http://api.openweathermap.org/data/2.5/weather?q='+city+','+state+'&units=imperial&APPID=35ca93649d9a8dca0bf141ea63ff8947', gotWeather);
-#function gotWeather(weather) 
-#{
-#  // Get the angle (convert to radians)
-#  var angle = radians(Number(weather.wind.deg));
-#  // Get the wind speed
-#  var windmag = Number(weather.wind.speed);
-#  var timeinfo = new Date();
+my $PartsMatchRequest = $PartsMatchResponse->{"request"};
+# print "Request: ", $PartsMatchResponse->{"request"}->{"__class__"}, "\n";
+printResult("Request: ", $PartsMatchRequest->{"__class__"});
 
-#print "Local Weather\n";
-#my $client = REST::Client->new();
-#$client->GET('http://api.openweathermap.org/data/2.5/weather?q=Upland,IN&units=imperial&APPID=35ca93649d9a8dca0bf141ea63ff8947');
-#print $client->responseContent();
+my $PartsMatchQuery = $PartsMatchRequest->{"queries"};
 
-#$client->GET('http://api.openweathermap.org/data/2.5/weather?zip=46989,us&units=imperial&APPID=35ca93649d9a8dca0bf141ea63ff8947');
-#print $client->responseContent();
+# print "Request for mpn: ", $PartsMatchResponse->{"request"}->{"queries"}[0]->{"mpn"}, "\n";
+printResult("Request for mpn: ", $PartsMatchQuery->[0]->{"mpn"});
+printResult("Request for seller: ", $PartsMatchQuery->[0]->{"seller"});
+printResult("Request for brand: ", $PartsMatchQuery->[0]->{"brand"});
 
-# --assetFeedID = 1279562671
-# --assetAPIKey = "L1uSo1KL0bOjim4dn1PQz7GX044oRmHutAKmnyzjG7xAc6qy"
-# --xivelyChannelName = "bootcount"
-# local url = ("https://api.xively.com/v2/feeds/" .. assetFeedID .. ".json")
-# https://api.xively.com/v2/feeds/1279562671.json
-# 	headers =
-#	{
-#		["X-Api-Key"] = assetAPIKey,
-#		Authorization = "Basic a25pZ2h0aGF3azprbmlnM3QzOHdr"
-#	}
-#print "\nXively\n";
-## my $XivelyClient = REST::Client->new({params=>{datastreams => 'bootcount'}});
-#my $XivelyClient = REST::Client->new();
-#$XivelyClient->addHeader(
-## 'X-ApiKey' => "L1uSo1KL0bOjim4dn1PQz7GX044oRmHutAKmnyzjG7xAc6qy",
-# Authorization => "Basic a25pZ2h0aGF3azprbmlnM3QzOHdr",
-#);
-## JSON is default return structure
-## $XivelyClient->GET('https://api.xively.com/v2/feeds/1279562671/datastreams/bootcount');
-#$XivelyClient->GET('https://api.xively.com/v2/feeds/1279562671');
-#
-#print $XivelyClient->responseContent();
+my $PartsMatchResult = $PartsMatchResponse->{"results"};
+# print "Results: ", $PartsMatchResponse->{"results"}[0]->{"__class__"}, "\n";
+printResult("Results: ", $PartsMatchResult->[0]->{"__class__"});
+printResult("Results hits: ", $PartsMatchResult->[0]->{"hits"});
+
+# Results items is an arry of parts information
+my $Part = $PartsMatchResult->[0]->{"items"};
+printResult("Number in items (parts) array: ", scalar @{$Part});
+
+#    getItems(0);
+#    getItems(1);
+#    getItems(2);
+for (my $i=0; $i < scalar @{$Part} ;$i++)
+{
+    getItems($i);
+}
 
 print "\n*********************************** end program $0  program.***********************************\n";
+
+# Get item (parts) information
+sub getItems
+{
+    $_ = shift; # grab array index
+    printResult("items $_ class: ", $Part->[$_]->{'__class__'});
+    printResult("items $_ mpn: ", $Part->[$_]->{'mpn'});
+    printResult("items $_ short desc: ", $Part->[$_]->{'short_description'});
+    printResult("items $_ octopart url: ", $Part->[$_]->{'octopart_url'});
+    # Brand Object - brand
+    my $Brand = $Part->[$_]->{'brand'};
+    printResult("Brand Name: ", $Brand->{'name'});
+    printResult("Brand url: ", $Brand->{'homepage_url'});
+    # Manufacturer Object - manufacturer
+    my $Manufacturer = $Part->[$_]->{'manufacturer'};
+    printResult("Mfg display name: ", $Manufacturer->{'name'});
+    # Description Object - descriptions
+    my $Description = $Part->[$_]->{'descriptions'};
+    printResult("number of descriptions: ", scalar @$Description);
+    
+    foreach my $d (@$Description)
+    {
+        printResult("    Description: ", $d->{'value'});
+    }
+    
+    my $Partspecs = $Part->[$_]->{'specs'};
+    while ( my ($key, $val) = each (%$Partspecs))
+    {
+        my $v = $val->{'display_value'};
+        print "       spec key: ", $key, " -> value: ", $v?$v:'NULL', "\n";
+    }
+    
+}
+
+# Need to handle the case where result of query is a NULL object
+sub printResult
+{
+    my ($str, $tmp) = @_;
+    print $str, $tmp?$tmp:'NULL', "\n";
+}

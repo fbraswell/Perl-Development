@@ -19,8 +19,8 @@ use REST::Client;
 use JSON;
 
 print "\n*********************************** start program $0 program.***********************************\n";
-
-my @mpn = ( '1n5062tr' );
+# Part numbers go here
+my @mpn = ( '1n5062tr', '1n4004' );
 
 my @partClassArray = (
 'ADAPTER','BAT','CAP','CBL','CON',
@@ -56,107 +56,116 @@ my $octopart = REST::Client->new({
 
 });
 
-my $part = $mpn[0];
-
-$octopart->buildQuery({'pretty_print'=>'true'});
-# $octopart->GET('/api/v3/parts/match?apikey=4ed77e1e&queries=[{"mpn":"2n7000"}]&pretty_print=true');
-# $octopart->GET("/api/v3/parts/match?apikey=4ed77e1e&queries=[{\"mpn\":\"$part\"}]");
-$octopart->GET('/api/v3/parts/match'
-                . '?' . 'apikey=4ed77e1e'
-                . '&' . "queries=[{\"mpn\":\"$part\"}]"
-                . '&' . 'include[]=descriptions'
-                . '&' . 'include[]=short_description'
-                . '&' . 'include[]=datasheets'
-                . '&' . 'include[]=category_uids'
-                . '&' . 'include[]=external_links'
-                . '&' . 'include[]=specs'
-                . '&' . 'pretty_print=true'
-                );
-# $octopart->GET('/api/v3/parts/match', {'apikey' => '4ed77e1e'});
-# $octopart->request('GET', 'http://octopart.com/api/v3/parts/match', 'request body content');
-print "\nHTTP request responseCode: ", $octopart->responseCode(), "\n";
-# print $octopart->responseCode();
- #   print "\nStart responseContent\n";
- #   print $octopart->responseContent();
- #   print "\nEnd responseContent\n";
-
-my $json = JSON->new->allow_nonref;
-my $jsonDecode = $json->decode($octopart->responseContent());
-
-my $PartsMatchResponse = $jsonDecode; # top level information
-
-#    print "millisec: ", $jsonDecode->{"msec"}, "\n";
-#    print "CLASS: ", $jsonDecode->{"__class__"}, "\n";
-
-# print "millisec: ", $PartsMatchResponse->{"msec"}, "\n";
-printResult("millisec: ", $PartsMatchResponse->{"msec"});
-# print "CLASS: ", $PartsMatchResponse->{"__class__"}, "\n";
-printResult("CLASS: ", $PartsMatchResponse->{"__class__"});
-
-my $PartsMatchRequest = $PartsMatchResponse->{"request"};
-# print "Request: ", $PartsMatchResponse->{"request"}->{"__class__"}, "\n";
-printResult("Request: ", $PartsMatchRequest->{"__class__"});
-
-my $PartsMatchQuery = $PartsMatchRequest->{"queries"};
-
-# print "Request for mpn: ", $PartsMatchResponse->{"request"}->{"queries"}[0]->{"mpn"}, "\n";
-printResult("Request for mpn: ", $PartsMatchQuery->[0]->{"mpn"});
-printResult("Request for seller: ", $PartsMatchQuery->[0]->{"seller"});
-printResult("Request for brand: ", $PartsMatchQuery->[0]->{"brand"});
-
-my $PartsMatchResult = $PartsMatchResponse->{"results"};
-# print "Results: ", $PartsMatchResponse->{"results"}[0]->{"__class__"}, "\n";
-printResult("Results: ", $PartsMatchResult->[0]->{"__class__"});
-printResult("Results hits: ", $PartsMatchResult->[0]->{"hits"});
-printResult("Results error: ", $PartsMatchResult->[0]->{"error"});
-
-# Results items is an arry of parts information
-my $Part = $PartsMatchResult->[0]->{"items"};
-printResult("Number in items (parts) array: ", scalar @{$Part});
-
-for (my $i=0; $i < scalar @{$Part} ;$i++)
+foreach my $p (@mpn)
 {
-    getItems($i);
+    getPart($p);
 }
 
-#        "category_uids": [
-#            "91ee5ce4a8204a29",
-#            "7542b8484461ae85",
-#            "5c6a91606d4187ad"]
-# print "\nGet Category\n";
-#    getCategory('91ee5ce4a8204a29');
-#    getCategory('7542b8484461ae85');
-#    getCategory('5c6a91606d4187ad');
+sub getPart
+{
+    my $part = shift;
 
-foreach my $c (@Category_UIDS)
-{
-    getCategory($c);
-}
+    $octopart->buildQuery({'pretty_print'=>'true'});
+    # $octopart->GET('/api/v3/parts/match?apikey=4ed77e1e&queries=[{"mpn":"2n7000"}]&pretty_print=true');
+    # $octopart->GET("/api/v3/parts/match?apikey=4ed77e1e&queries=[{\"mpn\":\"$part\"}]");
+    $octopart->GET('/api/v3/parts/match'
+                    . '?' . 'apikey=4ed77e1e'
+                    . '&' . "queries=[{\"mpn\":\"$part\"}]"
+                    . '&' . 'include[]=descriptions'
+                    . '&' . 'include[]=short_description'
+                    . '&' . 'include[]=datasheets'
+                    . '&' . 'include[]=category_uids'
+                    . '&' . 'include[]=external_links'
+                    . '&' . 'include[]=specs'
+                    . '&' . 'pretty_print=true'
+                    );
+    # $octopart->GET('/api/v3/parts/match', {'apikey' => '4ed77e1e'});
+    # $octopart->request('GET', 'http://octopart.com/api/v3/parts/match', 'request body content');
+    print "\nHTTP request responseCode: ", $octopart->responseCode(), "\n";
+    # print $octopart->responseCode();
+     #   print "\nStart responseContent\n";
+     #   print $octopart->responseContent();
+     #   print "\nEnd responseContent\n";
 
-foreach my $c (@Category_UIDS)
-{
-    print "all cat uids: $c\n";
-}
-foreach my $c (@Categories)
-{
-    print "all categories: $c\n";
-}
-# print Dumper(@Category_UIDS);
-foreach my $s (@Specifications)
-{
-    print "all spec: $s\n";
-}
-foreach my $d (@Descriptions)
-{
-    print "all desc: $d\n";
-}
+    my $json = JSON->new->allow_nonref;
+    my $jsonDecode = $json->decode($octopart->responseContent());
+
+    my $PartsMatchResponse = $jsonDecode; # top level information
+
+    #    print "millisec: ", $jsonDecode->{"msec"}, "\n";
+    #    print "CLASS: ", $jsonDecode->{"__class__"}, "\n";
+
+    # print "millisec: ", $PartsMatchResponse->{"msec"}, "\n";
+    printResult("millisec: ", $PartsMatchResponse->{"msec"});
+    # print "CLASS: ", $PartsMatchResponse->{"__class__"}, "\n";
+    printResult("CLASS: ", $PartsMatchResponse->{"__class__"});
+
+    my $PartsMatchRequest = $PartsMatchResponse->{"request"};
+    # print "Request: ", $PartsMatchResponse->{"request"}->{"__class__"}, "\n";
+    printResult("Request: ", $PartsMatchRequest->{"__class__"});
+
+    my $PartsMatchQuery = $PartsMatchRequest->{"queries"};
+
+    # print "Request for mpn: ", $PartsMatchResponse->{"request"}->{"queries"}[0]->{"mpn"}, "\n";
+    printResult("Request for mpn: ", $PartsMatchQuery->[0]->{"mpn"});
+    printResult("Request for seller: ", $PartsMatchQuery->[0]->{"seller"});
+    printResult("Request for brand: ", $PartsMatchQuery->[0]->{"brand"});
+
+    my $PartsMatchResult = $PartsMatchResponse->{"results"};
+    # print "Results: ", $PartsMatchResponse->{"results"}[0]->{"__class__"}, "\n";
+    printResult("Results: ", $PartsMatchResult->[0]->{"__class__"});
+    printResult("Results hits: ", $PartsMatchResult->[0]->{"hits"});
+    printResult("Results error: ", $PartsMatchResult->[0]->{"error"});
+
+    # Results items is an arry of parts information
+    my $Part = $PartsMatchResult->[0]->{"items"};
+    printResult("Number in items (parts) array: ", scalar @{$Part});
+
+    for (my $i=0; $i < scalar @{$Part} ;$i++)
+    {
+        getItems($Part, $i);
+    }
+
+    #        "category_uids": [
+    #            "91ee5ce4a8204a29",
+    #            "7542b8484461ae85",
+    #            "5c6a91606d4187ad"]
+    # print "\nGet Category\n";
+    #    getCategory('91ee5ce4a8204a29');
+    #    getCategory('7542b8484461ae85');
+    #    getCategory('5c6a91606d4187ad');
+
+    foreach my $c (@Category_UIDS)
+    {
+        getCategory($json, $c);
+    }
+
+    foreach my $c (@Category_UIDS)
+    {
+        print "all cat uids: $c\n";
+    }
+    foreach my $c (@Categories)
+    {
+        print "all categories: $c\n";
+    }
+    # print Dumper(@Category_UIDS);
+    foreach my $s (@Specifications)
+    {
+        print "all spec: $s\n";
+    }
+    foreach my $d (@Descriptions)
+    {
+        print "all desc: $d\n";
+    }
+} # getPart
 
 print "\n*********************************** end program $0  program.***********************************\n";
 
 # Ask Octopart for category information
 sub getCategory
 {
-    my $c = shift;
+#    my ($json, $c) = shift;
+    my ($json, $c) = @_;
     $octopart->GET("/api/v3/categories/$c"
                     . '?' . 'apikey=4ed77e1e');
     unless ($octopart->responseCode() ==200){
@@ -178,6 +187,7 @@ sub getCategory
 # Get item (parts) information
 sub getItems
 {
+    my $Part = shift;
     $_ = shift; # grab array index
     printResult("items $_ class: ", $Part->[$_]->{'__class__'});
     printResult("items $_ mpn: ", $Part->[$_]->{'mpn'});

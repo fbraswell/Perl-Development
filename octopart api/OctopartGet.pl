@@ -20,24 +20,23 @@ use JSON;
 
 print "\n*********************************** start program $0 program.***********************************\n";
 
-my @mpn = ( "1n4148" );
-# Open needed files
+my @mpn = ( '1n5062tr' );
 
-#	my $FHTfriends; # file handle
-#	my $FH = $FHTfriends;
-#	my $fnTfriends = 'twitter_friends_JSON.txt'; # file name for reading friends
-#	my $fn = $fnTfriends;
-#	if(open($FH, $fn))
-#	{
-#		print "** file opened $fn\n";
-#	} else
-#	{
-#		$FH = 0;
-#		print "** cannot open $fn, FH = $FH\n";
-#		$FHTfriends = $FH;
-#	#    return;
-#	}
-#	$FHTfriends = $FH;
+my @partClassArray = (
+'ADAPTER','BAT','CAP','CBL','CON',
+'DIODE','DISP','ELEC-MECH','HDR',
+'HS','IC','IND','LED',
+'MIC','MODULE','MOTOR','PCB',
+'PROTOTYPING','PS','RES','SOCKET',
+'SPKR','SW','TERM-BLCK','TRANS',
+'WIRE','XFRMR','HWR',
+);
+my @Category_UIDS = ();
+my @Categories = (); # Text 
+my @Descriptions = ();
+my @Short_Descriptions = ();
+my $requestedPN;
+my @Specifications = ();
 
 # CURL Command
 #	Franks-iMac:BerryGlobal frankbraswell$ curl -G http://octopart.com/api/v3/parts/match \
@@ -66,16 +65,20 @@ $octopart->GET('/api/v3/parts/match'
                 . '?' . 'apikey=4ed77e1e'
                 . '&' . "queries=[{\"mpn\":\"$part\"}]"
                 . '&' . 'include[]=descriptions'
+                . '&' . 'include[]=short_description'
+                . '&' . 'include[]=datasheets'
+                . '&' . 'include[]=category_uids'
+                . '&' . 'include[]=external_links'
                 . '&' . 'include[]=specs'
- #               . '&' . 'pretty_print=true'
+                . '&' . 'pretty_print=true'
                 );
 # $octopart->GET('/api/v3/parts/match', {'apikey' => '4ed77e1e'});
 # $octopart->request('GET', 'http://octopart.com/api/v3/parts/match', 'request body content');
 print "\nHTTP request responseCode: ", $octopart->responseCode(), "\n";
 # print $octopart->responseCode();
-#    print "\nStart responseContent\n";
-#    print $octopart->responseContent();
-#    print "\nEnd responseContent\n";
+ #   print "\nStart responseContent\n";
+ #   print $octopart->responseContent();
+ #   print "\nEnd responseContent\n";
 
 my $json = JSON->new->allow_nonref;
 my $jsonDecode = $json->decode($octopart->responseContent());
@@ -105,20 +108,72 @@ my $PartsMatchResult = $PartsMatchResponse->{"results"};
 # print "Results: ", $PartsMatchResponse->{"results"}[0]->{"__class__"}, "\n";
 printResult("Results: ", $PartsMatchResult->[0]->{"__class__"});
 printResult("Results hits: ", $PartsMatchResult->[0]->{"hits"});
+printResult("Results error: ", $PartsMatchResult->[0]->{"error"});
 
 # Results items is an arry of parts information
 my $Part = $PartsMatchResult->[0]->{"items"};
 printResult("Number in items (parts) array: ", scalar @{$Part});
 
-#    getItems(0);
-#    getItems(1);
-#    getItems(2);
 for (my $i=0; $i < scalar @{$Part} ;$i++)
 {
     getItems($i);
 }
 
+#        "category_uids": [
+#            "91ee5ce4a8204a29",
+#            "7542b8484461ae85",
+#            "5c6a91606d4187ad"]
+# print "\nGet Category\n";
+#    getCategory('91ee5ce4a8204a29');
+#    getCategory('7542b8484461ae85');
+#    getCategory('5c6a91606d4187ad');
+
+foreach my $c (@Category_UIDS)
+{
+    getCategory($c);
+}
+
+foreach my $c (@Category_UIDS)
+{
+    print "all cat uids: $c\n";
+}
+foreach my $c (@Categories)
+{
+    print "all categories: $c\n";
+}
+# print Dumper(@Category_UIDS);
+foreach my $s (@Specifications)
+{
+    print "all spec: $s\n";
+}
+foreach my $d (@Descriptions)
+{
+    print "all desc: $d\n";
+}
+
 print "\n*********************************** end program $0  program.***********************************\n";
+
+# Ask Octopart for category information
+sub getCategory
+{
+    my $c = shift;
+    $octopart->GET("/api/v3/categories/$c"
+                    . '?' . 'apikey=4ed77e1e');
+    unless ($octopart->responseCode() ==200){
+    print "HTTP request responseCode: ", $octopart->responseCode(), "\n";
+    }
+    # print $octopart->responseCode();
+#        print "\nStart category\n";
+#        print $octopart->responseContent();
+        my $Category = $json->decode($octopart->responseContent());
+#        print "\n";
+#        print "Category name: ", $Category->{'name'}, "\n";
+        push @Categories, $Category->{'name'};
+#        print "\nEnd category\n";
+        
+        # Sample category data structure
+ #       {"ancestor_names": ["Electronic Parts", "Passive Components", "Resistors"], "uid": "91ee5ce4a8204a29", "num_parts": 708565, "ancestor_uids": ["8a1e4714bb3951d9", "7542b8484461ae85", "5c6a91606d4187ad"], "children_uids": [], "__class__": "Category", "parent_uid": "5c6a91606d4187ad", "name": "Through-Hole Resistors"}      
+} # sub getCategory
 
 # Get item (parts) information
 sub getItems
@@ -132,6 +187,7 @@ sub getItems
     my $Brand = $Part->[$_]->{'brand'};
     printResult("Brand Name: ", $Brand->{'name'});
     printResult("Brand url: ", $Brand->{'homepage_url'});
+    printResult("Brand uid: ", $Brand->{'uid'});
     # Manufacturer Object - manufacturer
     my $Manufacturer = $Part->[$_]->{'manufacturer'};
     printResult("Mfg display name: ", $Manufacturer->{'name'});
@@ -142,20 +198,71 @@ sub getItems
     foreach my $d (@$Description)
     {
         printResult("    Description: ", $d->{'value'});
-    }
+        push @Descriptions, $d->{'value'};
+#        foreach my $p (@partClassArray){
+#            if($d->{'value'} =~ /$p/i)
+#            {
+#                print "     FOUND $p!\n";
+#            }
+#        }       
+    } # foreach my $d (@$Description)
     
     my $Partspecs = $Part->[$_]->{'specs'};
     while ( my ($key, $val) = each (%$Partspecs))
     {
         my $v = $val->{'display_value'};
-        print "       spec key: ", $key, " -> value: ", $v?$v:'NULL', "\n";
+        print "       spec: ", $key, ": ", $v?$v:'NULL', "\n";
+        my $tmp = sprintf "%s%s%s", $key , ": " , $v?$v:'NULL';
+ #       print $tmp, "\n";
+        push @Specifications, $tmp; # Collect specs
     }
     
-}
+    my $Categories = $Part->[$_]->{'category_uids'};
+    foreach my $c (@$Categories)
+    {
+ #       print " Category id: $c\n";
+        push @Category_UIDS, $c;
+    }    
+} # sub getItems
 
 # Need to handle the case where result of query is a NULL object
 sub printResult
 {
     my ($str, $tmp) = @_;
     print $str, $tmp?$tmp:'NULL', "\n";
-}
+} # sub printResult
+
+
+
+#    Class	Type1 for each Class								
+#    ADAPTER	AC-MAINS								
+#    BAT	LITHIUM								
+#    CAP	AL	CERAMIC	FILM						
+#    CBL	RIBBON-JUMPER								
+#    CON	F:BARREL								
+#    DIODE	RECTIFIER	SCHOTTKY	LASER	SIGNAL	ZENER				
+#    DISP	OLED								
+#    ELEC-MECH	BATT-HOLDER								
+#    HDR	SHROUDED	SOCKET	UNSHROUDED						
+#    HS	DISCRETE								
+#    IC	LOGIC	MCU	OPAMP	REFERENCE	REGULATOR				
+#    IND	FIXED								
+#    LED	AMBR	YLW	GRN	IR	RED	WHT			
+#    MIC	ELECTRET								
+#    MODULE	ARDUINO								
+#    MOTOR	LEGO-M								
+#    PCB	LaserRcvr_Boost_board_v1.2	LaserRcvr_Output_board_v1.2	LedFob_r2d	Nano-CC-EL-ver-0.62	simple_ps_1v0				
+#    PROTOTYPING	BREADBOARD WIRE KIT	SOLDERLESS BREADBOARD							
+#    PS	AC								
+#    RES	F (thin film)	TF (thick film)	CF (carbon film)	CdS	POT				
+#    SOCKET	DIP								
+#    SPKR	MAGNETIC								
+#    SW	BIN-ENCODER	MOMENTARY	MULTI-DIRECTIONAL	SPDT					
+#    TERM-BLCK	SCREW								
+#    TRANS	BJT	MOSFET							
+#    WIRE	MAGNET								
+#    XFRMR	LF (line freq)	SMF (switch-mode freq)	RF						
+#    HWR	STANDOFF								
+#
+
+

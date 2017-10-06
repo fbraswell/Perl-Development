@@ -20,7 +20,15 @@ use JSON;
 
 print "\n*********************************** start program $0 program.***********************************\n";
 # Part numbers go here
-my @mpn = ( '1n5062tr', '1n4004' );
+
+my $pnum = shift;
+print "command line input: $pnum\n";
+
+my @mpn = (  );
+if($pnum) # if argument found put it in @mpn
+{
+    push @mpn, $pnum;
+}
 
 my @partClassArray = (
 'ADAPTER','BAT','CAP','CBL','CON',
@@ -31,6 +39,17 @@ my @partClassArray = (
 'SPKR','SW','TERM-BLCK','TRANS',
 'WIRE','XFRMR','HWR',
 );
+my @sellerList = (
+    'Newark',
+    'Digi-Key',
+    'Mouser', 
+    'Arrow',
+    'element14',
+);
+for (@sellerList)
+{
+  print "Seller list: ", $_, "\n";;
+}
 my @Category_UIDS = ();
 my @Categories = (); # Text 
 my @Descriptions = ();
@@ -204,7 +223,7 @@ sub getItems
     # Description Object - descriptions
     my $Description = $Part->[$_]->{'descriptions'};
     printResult("number of descriptions: ", scalar @$Description);
-    
+
     foreach my $d (@$Description)
     {
         printResult("    Description: ", $d->{'value'});
@@ -232,7 +251,37 @@ sub getItems
     {
  #       print " Category id: $c\n";
         push @Category_UIDS, $c;
-    }    
+    }   
+    
+    my $Offers = $Part->[$_]->{'offers'};
+    
+    foreach my $o (@$Offers)
+    {      
+        my $seller = $o->{'seller'}; # get seller object
+#        my @matches = grep /$seller->{'name'}/, @sellerList;
+#       for (@matches)
+        for (grep /$seller->{'name'}/i, @sellerList)
+            {
+              print "          Seller Matches: ", $_, "\n";;
+            }
+#        if(scalar @matches)
+#        {
+#            print "   --- found seller in list!\n";
+#        }
+        
+        print "           Seller: ", $seller->{'name'};
+        print ", PartOffer sku: ", $o->{'sku'}, "\n";
+        my $prices = $o->{'prices'}->{'USD'};
+        if($prices) # Are there prices in USD?
+        {
+            my $qty1 = $prices->[0]; # first element of the price array is the 
+                                     # min quantity
+            print "            quantity: ", $qty1->[0], ", price: ", $qty1->[1], "\n";
+        } 
+    }
+    
+    
+    
 } # sub getItems
 
 # Need to handle the case where result of query is a NULL object

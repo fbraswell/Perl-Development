@@ -42,12 +42,15 @@ if($pnum) # if argument found put it in @mpn
 my @GSheaders = qw(Value	Item	Description	MPN	
                     Manufacturer  Vendor_PN	Vendor	Category	
                     Type	Location	Location_2	Quantity);	
+my %GSvalues = ();
 print "GSheader: ";
-foreach (@GSheaders)
-{
-    print $_, ", ";
-}
+map {print $_, ', '} @GSheaders;
 print "\n";
+#        foreach (@GSheaders)
+#        {
+#            print $_, ", ";
+#        }
+#        print "\n";
 my @partClassArray = (
 'ADAPTER','BAT','CAP','CBL','CON',
 'DIODE','DISP','ELEC-MECH','HDR',
@@ -65,10 +68,11 @@ my @sellerList = (
     'element14',
 );
 print "Seller list: ";
-for (@sellerList)
-{
-  print $_, ", ";;
-}
+map {print $_, ", "} @sellerList;
+#        for (@sellerList)
+#        {
+#          print $_, ", ";
+#        }
 print "\n";
 my @Category_UIDS = ();
 my @Categories = (); # Text 
@@ -116,6 +120,7 @@ sub getPart
                     . '&' . 'include[]=category_uids'
                     . '&' . 'include[]=external_links'
                     . '&' . 'include[]=specs'
+                    . '&' . 'include[]=imagesets'
                     . '&' . 'pretty_print=true'
                     );
     # $octopart->GET('/api/v3/parts/match', {'apikey' => '4ed77e1e'});
@@ -172,30 +177,21 @@ sub getPart
         getItems($Part, $i);
     }
 
-    #        "category_uids": [
-    #            "91ee5ce4a8204a29",
-    #            "7542b8484461ae85",
-    #            "5c6a91606d4187ad"]
-    # print "\nGet Category\n";
-    #    getCategory('91ee5ce4a8204a29');
-    #    getCategory('7542b8484461ae85');
-    #    getCategory('5c6a91606d4187ad');
-
     foreach my $c (@Category_UIDS)
     {
         getCategory($json, $c);
     }
 
-    foreach my $c (@Category_UIDS)
-    {
-        print "all cat uids: $c\n";
-    }
+#    foreach my $c (@Category_UIDS)
+#    {
+#        print "all cat uids: $c\n";
+#    }
     #____________________________
-    print "\nNumber of Categories: ", scalar @Categories, "\n";
-    foreach my $c (@Categories)
-    {
-        print "all categories: $c\n";
-    }
+#    print "\nNumber of Categories: ", scalar @Categories, "\n";
+#    foreach my $c (@Categories)
+#    {
+#        print "all categories: $c\n";
+#    }
     # print Dumper(@Category_UIDS);
     
         # Removing duplicate strings from an array
@@ -207,41 +203,70 @@ sub getPart
     my @unique = sort keys %hashput; # unique sorted specs
     
     print "\nNumber of Sorted Categories: ", scalar @unique, "\n";
-    foreach my $s (@unique)
-    {
-        print "all sorted categories: $s\n";
-    }
+    map {print "all sorted categories: $_\n"} @unique;
+#    foreach my $s (@unique)
+#    {
+#        print "all sorted categories: $s\n";
+#    }
     #____________________________
-    print "\nNumber of Specs: ", scalar @Specifications, "\n";
-    foreach my $s (@Specifications)
-    {
-        print "all spec: $s\n";
-    }
+#    print "\nNumber of Specs: ", scalar @Specifications, "\n";
+#    foreach my $s (@Specifications)
+#    {
+#        print "all spec: $s\n";
+#    }
     
     %hashput = ();
     @hashput{@Specifications} = ();
     @unique = sort keys %hashput;
     
     print "\nNumber of Sorted Specs: ", scalar @unique, "\n";
-    foreach my $s (@unique)
-    {
-        print "all sorted spec: $s\n";
-    }
+    map {print "all sorted spec: $_\n"} @unique;
+    
+#    foreach my $s (@unique)
+#    {
+#        print "all sorted spec: $s\n";
+#    }
     #____________________________
-    print "\nNumber of Desc: ", scalar @Descriptions, "\n";
-    foreach my $d (@Descriptions)
-    {
-        print "all desc: $d\n";
-    }
+#    print "\nNumber of Desc: ", scalar @Descriptions, "\n";
+#    foreach my $d (@Descriptions)
+#    {
+#        print "all desc: $d\n";
+#    }
     %hashput = ();
     @hashput{@Descriptions} = ();
     @unique = sort keys %hashput;
     print "\nNumber of Sorted Desc: ", scalar @unique, "\n";
-    foreach my $d (@unique)
-    {
-        print "all sorted desc: $d\n";
-    }
+    map {print "all sorted desc: $_\n"} @unique;
+#    foreach my $d (@unique)
+#    {
+#        print "all sorted desc: $d\n";
+#    }
     #____________________________
+    
+#    print "\nNumber of Short Desc: ", scalar @Short_Descriptions, "\n";
+#    foreach my $d (@Short_Descriptions)
+#    {
+#        print "all short desc: $d\n";
+#    }
+    %hashput = ();
+    @hashput{@Short_Descriptions} = ();
+    @unique = sort keys %hashput;
+    print "\nNumber of Sorted Short Desc: ", scalar @unique, "\n";
+    map {print "all sorted short desc: $_\n"} @unique;
+#    foreach my $d (@unique)
+#    {
+#        print "all sorted short desc: $d\n";
+#    }
+    #____________________________
+    
+    print "Spreadsheet Columns\n";
+    map {defined $GSvalues{$_}?print "$_: $GSvalues{$_} ": print "$_: na " } @GSheaders;
+    print "\n";
+#    foreach (@GSheaders)
+#    {
+#        print "$_: $GSvalues{$_}; "
+#    }
+    
 } # getPart
 
 print "\n*********************************** end program $0  program.***********************************\n";
@@ -272,11 +297,18 @@ sub getCategory
 # Get item (parts) information
 sub getItems
 {
+# ordering for the GS header
+#           my @GSheaders = qw(Value	Item	Description	MPN	
+#                    Manufacturer  Vendor_PN	Vendor	Category	
+#                    Type	Location	Location_2	Quantity);	
+    
     my $Part = shift;
     $_ = shift; # grab array index
     printResult("items $_ class: ", $Part->[$_]->{'__class__'});
     printResult("items $_ mpn: ", $Part->[$_]->{'mpn'});
     printResult("items $_ short desc: ", $Part->[$_]->{'short_description'});
+    push @Short_Descriptions, $Part->[$_]->{'short_description'};
+    
     printResult("items $_ octopart url: ", $Part->[$_]->{'octopart_url'});
     # Brand Object - brand
     my $Brand = $Part->[$_]->{'brand'};
@@ -290,17 +322,24 @@ sub getItems
     my $Description = $Part->[$_]->{'descriptions'};
     printResult("number of descriptions: ", scalar @$Description);
 
-    foreach my $d (@$Description)
+    map {printResult("    Description: ", $_->{'value'});
+         push @Descriptions, $_->{'value'}; 
+        } @$Description;
+         
+#    foreach my $d (@$Description)
+#    {
+#        printResult("    Description: ", $d->{'value'});
+#        push @Descriptions, $d->{'value'};     
+#    } # foreach my $d (@$Description)
+
+    unless ($_) # use only the first mfg part values for now
     {
-        printResult("    Description: ", $d->{'value'});
-        push @Descriptions, $d->{'value'};
-#        foreach my $p (@partClassArray){
-#            if($d->{'value'} =~ /$p/i)
-#            {
-#                print "     FOUND $p!\n";
-#            }
-#        }       
-    } # foreach my $d (@$Description)
+        %GSvalues = ( Item =>  $Part->[$_]->{'mpn'},
+                        MPN => $Part->[$_]->{'mpn'},
+                        Manufacturer => $Manufacturer->{'name'},
+                        Description => $Part->[$_]->{'short_description'},
+                        );
+    }
     
     my $Partspecs = $Part->[$_]->{'specs'};
     while ( my ($key, $val) = each (%$Partspecs))
@@ -340,7 +379,7 @@ sub getItems
                                      # min quantity
             print "            quantity: ", $qty1->[0], ", price: ", $qty1->[1], "\n";
         } 
-    }   
+    }   # foreach my $o (@$Offers)
     
 } # sub getItems
 

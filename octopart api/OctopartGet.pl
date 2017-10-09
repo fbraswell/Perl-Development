@@ -6,6 +6,9 @@ use warnings;
 # Installed JSON module for Perl but cannot load it, Can't locate JSON.pm in @INC
 # https://stackoverflow.com/questions/41143638/installed-json-module-for-perl-but-cannot-load-it-cant-locate-json-pm-in-inc
 
+# Octopart REST API Reference (V3)
+# https://octopart.com/api/docs/v3/rest-api 
+
 use LWP::Simple;
 use Data::Dumper;
 # use utf8;
@@ -14,6 +17,11 @@ binmode STDOUT, ":utf8"; # get rid of warnings about special characters
 # use Scalar::Util 'blessed';
 # use JSON qw( decode_json );
 # http://www.tutorialspoint.com/json/json_perl_example.htm
+
+# HTTP Error Codes
+# 200 - Connected ok
+# 500 Can't connect to Octopart - internet down?
+
 
 use REST::Client;
 use JSON;
@@ -30,6 +38,16 @@ if($pnum) # if argument found put it in @mpn
     push @mpn, $pnum;
 }
 
+# ordering for the GS header
+my @GSheaders = qw(Value	Item	Description	MPN	
+                    Manufacturer  Vendor_PN	Vendor	Category	
+                    Type	Location	Location_2	Quantity);	
+print "GSheader: ";
+foreach (@GSheaders)
+{
+    print $_, ", ";
+}
+print "\n";
 my @partClassArray = (
 'ADAPTER','BAT','CAP','CBL','CON',
 'DIODE','DISP','ELEC-MECH','HDR',
@@ -46,10 +64,12 @@ my @sellerList = (
     'Arrow',
     'element14',
 );
+print "Seller list: ";
 for (@sellerList)
 {
-  print "Seller list: ", $_, "\n";;
+  print $_, ", ";;
 }
+print "\n";
 my @Category_UIDS = ();
 my @Categories = (); # Text 
 my @Descriptions = ();
@@ -111,6 +131,13 @@ sub getPart
 
     my $PartsMatchResponse = $jsonDecode; # top level information
 
+#        PartsMatchResponse schema:
+#        Property	 Description	         Example	                    Empty Value
+#        request	 The original request	 <PartsMatchRequest object>	    n/a
+#        results	 List of query results	 [<PartsMatchResult object>]	n/a
+#        msec	     The server response 
+#                    time in milliseconds	  234	                         n/a
+
     #    print "millisec: ", $jsonDecode->{"msec"}, "\n";
     #    print "CLASS: ", $jsonDecode->{"__class__"}, "\n";
 
@@ -163,19 +190,58 @@ sub getPart
     {
         print "all cat uids: $c\n";
     }
+    #____________________________
+    print "\nNumber of Categories: ", scalar @Categories, "\n";
     foreach my $c (@Categories)
     {
         print "all categories: $c\n";
     }
     # print Dumper(@Category_UIDS);
+    
+        # Removing duplicate strings from an array
+        # http://www.perlmonks.org/?node_id=604547
+        # Hash slices explained
+        # http://www.webquills.net/web-development/perl/perl-5-hash-slices-can-replace.html
+    my %hashput;
+    @hashput{@Categories} = (); # use hash keys to get rid of dups
+    my @unique = sort keys %hashput; # unique sorted specs
+    
+    print "\nNumber of Sorted Categories: ", scalar @unique, "\n";
+    foreach my $s (@unique)
+    {
+        print "all sorted categories: $s\n";
+    }
+    #____________________________
+    print "\nNumber of Specs: ", scalar @Specifications, "\n";
     foreach my $s (@Specifications)
     {
         print "all spec: $s\n";
     }
+    
+    %hashput = ();
+    @hashput{@Specifications} = ();
+    @unique = sort keys %hashput;
+    
+    print "\nNumber of Sorted Specs: ", scalar @unique, "\n";
+    foreach my $s (@unique)
+    {
+        print "all sorted spec: $s\n";
+    }
+    #____________________________
+    print "\nNumber of Desc: ", scalar @Descriptions, "\n";
     foreach my $d (@Descriptions)
     {
         print "all desc: $d\n";
     }
+    %hashput = ();
+    @hashput{@Descriptions} = ();
+    @unique = sort keys %hashput;
+    print "\nNumber of Sorted Desc: ", scalar @unique, "\n";
+    foreach my $d (@unique)
+    {
+        print "all sorted desc: $d\n";
+    }
+    #____________________________
 } # getPart
 
 print "\n*********************************** end program $0  program.***********************************\n";
@@ -264,10 +330,6 @@ sub getItems
             {
               print "          Seller Matches: ", $_, "\n";;
             }
-#        if(scalar @matches)
-#        {
-#            print "   --- found seller in list!\n";
-#        }
         
         print "           Seller: ", $seller->{'name'};
         print ", PartOffer sku: ", $o->{'sku'}, "\n";
@@ -278,9 +340,7 @@ sub getItems
                                      # min quantity
             print "            quantity: ", $qty1->[0], ", price: ", $qty1->[1], "\n";
         } 
-    }
-    
-    
+    }   
     
 } # sub getItems
 

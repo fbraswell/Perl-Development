@@ -34,9 +34,10 @@ print "command line input: $pnum\n" if $pnum;
 
 my $verbose; # default 0 - Print everything
 
+# Location,Location 2,Quantity,Item
+
 my $inStr = 
-"Location,Location 2,Quantity,Item
-Euler 229 Teaching Lab,,20,1N5235BTR
+"Euler 229 Teaching Lab,,20,1N5235BTR
 Euler 229 Teaching Lab,,10,1N5251B
 Euler 229 Teaching Lab,,25,1N5819
 Euler 229 Teaching Lab,,25,512-1N5231B
@@ -114,12 +115,9 @@ Euler 229 Teaching Lab,,10,PJ-102AH
 Euler 229 Teaching Lab,,9,220ADC16
 Euler 229 Teaching Lab,,50,TL1105FF100Q";
 
-<<<<<<< Updated upstream
-=======
-my @mpn; # Manufacturers part number
->>>>>>> Stashed changes
 my @lines = split "\n", $inStr;
 my %partLoc = (); # Part location based on array above
+my @partsOrder = (); # ordering of parts in the input spreadsheet file
 #map {my ($rm, $loc, $qty, $partx) = split ',', $_;
 #        # Make the part the key to an array of room, loc & qty
 #        $rm = 'rm na' unless($rm);
@@ -129,58 +127,40 @@ my %partLoc = (); # Part location based on array above
 ##        $loc?$loc:'loc na';
 ##        $qty?$qty:'qty na';
 #          $partLoc{$partx} = ($rm, $loc, $qty)  } @lines;
-<<<<<<< Updated upstream
-my $rm; my $loc; my $qty; my $partx;       
-foreach (@lines)
-{
-    ($rm, $loc, $qty, $partx) = split ",", $_;
-=======
 # my $rm; my $loc; my $qty; my $partx;       
 foreach (@lines)
 {
     my ($rm, $loc, $qty, $partx) = split ",", $_;
->>>>>>> Stashed changes
         # Make the part the key to an array of room, loc & qty
     $rm = 'rm na' unless($rm);
     $loc = 'loc na' unless($loc);
     $qty = 'qty na' unless($qty);
-    
-<<<<<<< Updated upstream
-    print "$partx: $rm, $loc, $qty\n";
-#        $rm?$rm:'rm na'; 
-#        $loc?$loc:'loc na';
-#        $qty?$qty:'qty na';
-    $partLoc{$partx} = ($rm, $loc, $qty); 
-}
-          
-map {my ($l, $l2, $q) = $partLoc{$_}; print "key: $_: $l, $l2, $q\n"; } keys %partLoc;
-
-my @mpn = qw( 1N5235BTR 1N5251B 1N5819 512-1N5231B 1N5231B);
-=======
+    push @partsOrder, $partx;
 #    print "$partx: $rm, $loc, $qty\n";
 #        $rm?$rm:'rm na'; 
 #        $loc?$loc:'loc na';
 #        $qty?$qty:'qty na';
-    push @mpn, $partx unless scalar @mpn > 10;
-    $partLoc{$partx} = [($rm, $loc, $qty)]; # need to reference address of array
+    $partLoc{$partx} = [($rm, $loc, $qty)]; 
 }
-          
-# map {my ($l, $l2, $q) = @{$partLoc{$_}}; print "key: $_: $l, $l2, $q\n"; } keys %partLoc;
 
-    print "MPNs: ";
-    @mpn = qw( 1N5235BTR 1N5251B  1N5231B
-                     1N5819 1N4148W-TP
-                    BZX85B5V1-TR 551-0207F);
-    map {print "$_, "} @mpn;
-    print "\n";
->>>>>>> Stashed changes
+# map {print "$_ "} @partsOrder;
+# print the information in the location & quantity hash
+#    map {my ($l, $l2, $q) = @{$partLoc{$_}}; 
+#            print "key: $_: $l, $l2, $q\n"; } keys %partLoc;
+
+my @mpn = qw( 1N5235BTR 1N5251B 1N5819 512-1N5231B 1N5231B);
+
+@mpn = @partsOrder;
+print "\n____Parts\n";
+map { print "$_ "} @mpn;
+print "\n____End Parts\n";
 #    if($pnum) # if argument found put it in @mpn
 #    {
         @mpn =  ($pnum) if $pnum;
 #    }
 
 # ordering for the GS header
-my @GSheaders = qw(Value	Item	Description	MPN	
+my @GSheaders = qw(Value    Search	Item	Description	MPN	
                     Manufacturer  Vendor_PN	Vendor	Category	
                     Type	Location	Location_2	Quantity);	
 my %GSvalues = ();
@@ -234,7 +214,7 @@ my @Specifications = ();
 
 my $octopart = REST::Client->new({
 	host => 'http://octopart.com',
-#	'pretty_print' => 'true',
+	'pretty_print' => 'true',
 #	'apikey' => "4ed77e1e",
 #	queries => "[{\"mpn\":\"2n7000\"}]", 
 });
@@ -406,31 +386,38 @@ sub getPart
 #    {
 #        print "all short desc: $d\n";
 #    }
-    %hashput = ();
-    @hashput{@Short_Descriptions} = ();
-    @unique = sort keys %hashput;
-    
-    print "\nNumber of Sorted Short Desc: ", scalar @unique, "\n" if $verbose;
-    map {print "all sorted short desc: $_\n"} @unique if $verbose;
+    unless(scalar @Short_Descriptions)
+    {
+        %hashput = ();
+        @hashput{@Short_Descriptions} = ();
+        @unique = sort keys %hashput;
+        print "\nNumber of Sorted Short Desc: ", scalar @unique, "\n" if $verbose;
+        map {print "all sorted short desc: $_\n"} @unique if $verbose;
+    }
 #    foreach my $d (@unique)
 #    {
 #        print "all sorted short desc: $d\n";
 #    }
     #____________________________
     
-<<<<<<< Updated upstream
-=======
     # Fill in items from $inpStr - location, location 2, qty
     # Location	Location_2	Quantity
+    unless (exists $partLoc{$part})
+    {
+        print "WARNING: This part: $part, doesn't exist in the hash.\n";
+        return;
+    }
+    
     my ($l, $l2, $q) = @{$partLoc{$part}};
-    # print "part: $part, Loc: $l, Loc2: $l2, Qty: $q\n";
+ #   print "part: $part, Loc: $l, Loc2: $l2, Qty: $q\n";
+    $GSvalues{'Search'} = $part;
     $GSvalues{'Location'} =  $l;
     $GSvalues{'Location_2'} =  $l2;
     $GSvalues{'Quantity'} =  $q;
     
->>>>>>> Stashed changes
     print "Spreadsheet Columns\n" if $verbose;
  #   map {defined $GSvalues{$_}?print "$_: $GSvalues{$_}, ": print "$_: na, " } @GSheaders;
+    print "==>";
     map {defined $GSvalues{$_}?print "$GSvalues{$_}, ": print "na, " } @GSheaders;
     print "\n";
 #    foreach (@GSheaders)
@@ -438,21 +425,18 @@ sub getPart
 #        print "$_: $GSvalues{$_}; "
 #    }
     
-    # Fill in items from $inpStr - location, location 2, qty
-    # Location	Location_2	Quantity
-<<<<<<< Updated upstream
-    my ($l, $l2, $q) = $partLoc{$part};
-    print "part: $part, Loc: $l, Loc2: $l2, Qty: $q\n";
-    $GSvalues{'Location'} =  $l;
-    $GSvalues{'Location_2'} =  $l2;
-    $GSvalues{'Quantity'} =  $q;
-=======
+#    # Fill in items from $inpStr - location, location 2, qty
+#    # Location	Location_2	Quantity
+#    unless (exists $partLoc{$part})
+#    {
+#        print "WARNING: This part: $part, doesn't exist in the hash.\n";
+#    }
+#    
 #    my ($l, $l2, $q) = @{$partLoc{$part}};
 #    print "part: $part, Loc: $l, Loc2: $l2, Qty: $q\n";
 #    $GSvalues{'Location'} =  $l;
 #    $GSvalues{'Location_2'} =  $l2;
 #    $GSvalues{'Quantity'} =  $q;
->>>>>>> Stashed changes
     
 } # getPart
 
@@ -622,5 +606,3 @@ sub printResult
 #    XFRMR	LF (line freq)	SMF (switch-mode freq)	RF						
 #    HWR	STANDOFF								
 #
-
-

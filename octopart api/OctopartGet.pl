@@ -118,7 +118,20 @@ Euler 229 Teaching Lab,,50,TL1105FF100Q";
 my @lines = split "\n", $inStr;
 my %partLoc = (); # Part location based on array above
 my @partsOrder = (); # ordering of parts in the input spreadsheet file
+<<<<<<< HEAD
        
+=======
+#map {my ($rm, $loc, $qty, $partx) = split ',', $_;
+#        # Make the part the key to an array of room, loc & qty
+#        $rm = 'rm na' unless($rm);
+#        $loc = 'loc na' unless($loc);
+#        $qty = 'qty na' unless($qty);
+##        $rm?$rm:'rm na'; 
+##        $loc?$loc:'loc na';
+##        $qty?$qty:'qty na';
+#          $partLoc{$partx} = ($rm, $loc, $qty)  } @lines;
+# my $rm; my $loc; my $qty; my $partx;       
+>>>>>>> origin/master
 foreach (@lines)
 {
     my ($rm, $loc, $qty, $partx) = split ",", $_;
@@ -126,21 +139,44 @@ foreach (@lines)
     $rm = 'rm na' unless($rm);
     $loc = 'loc na' unless($loc);
     $qty = 'qty na' unless($qty);
+<<<<<<< HEAD
         # keep ordered list of the part names
     push @partsOrder, $partx;
         # Put array in hash indexed by part name
     $partLoc{$partx} = [($rm, $loc, $qty)]; 
 }
     # test group of part names
+=======
+    push @partsOrder, $partx;
+#    print "$partx: $rm, $loc, $qty\n";
+#        $rm?$rm:'rm na'; 
+#        $loc?$loc:'loc na';
+#        $qty?$qty:'qty na';
+    $partLoc{$partx} = [($rm, $loc, $qty)]; 
+}
+
+# map {print "$_ "} @partsOrder;
+# print the information in the location & quantity hash
+#    map {my ($l, $l2, $q) = @{$partLoc{$_}}; 
+#            print "key: $_: $l, $l2, $q\n"; } keys %partLoc;
+
+>>>>>>> origin/master
 my @mpn = qw( 1N5235BTR 1N5251B 1N5819 512-1N5231B 1N5231B);
 
 @mpn = @partsOrder;
 print "\n____Parts\n";
 map { print "$_ "} @mpn;
 print "\n____End Parts\n";
+<<<<<<< HEAD
 
     # If a part is in the command line
 @mpn =  ($pnum) if $pnum;
+=======
+#    if($pnum) # if argument found put it in @mpn
+#    {
+        @mpn =  ($pnum) if $pnum;
+#    }
+>>>>>>> origin/master
 
 # ordering for the GS header
 my @GSheaders = qw(Value    Search	Item	Description	MPN	
@@ -187,9 +223,17 @@ my @Specifications = ();
 # $uri->query_form( $key1 => $val1, $key2 => $val2, ... )
     # Create Octopart object
 my $octopart = REST::Client->new({
+<<<<<<< HEAD
         host => 'http://octopart.com',
         'pretty_print' => 'true',
     });
+=======
+	host => 'http://octopart.com',
+	'pretty_print' => 'true',
+#	'apikey' => "4ed77e1e",
+#	queries => "[{\"mpn\":\"2n7000\"}]", 
+});
+>>>>>>> origin/master
 
 foreach (@mpn)
 {
@@ -330,6 +374,13 @@ sub getPart
         print "\nNumber of Sorted Short Desc: ", scalar @unique, "\n" if $verbose;
         map {print "all sorted short desc: $_\n"} @unique if $verbose;
     }
+<<<<<<< HEAD
+=======
+#    foreach my $d (@unique)
+#    {
+#        print "all sorted short desc: $d\n";
+#    }
+>>>>>>> origin/master
     #____________________________
     
     # Fill in items from $inpStr - location, location 2, qty
@@ -341,16 +392,44 @@ sub getPart
     }
     
     my ($l, $l2, $q) = @{$partLoc{$part}};
+<<<<<<< HEAD
+=======
+ #   print "part: $part, Loc: $l, Loc2: $l2, Qty: $q\n";
+>>>>>>> origin/master
     $GSvalues{'Search'} = $part;
     $GSvalues{'Location'} =  $l;
     $GSvalues{'Location_2'} =  $l2;
     $GSvalues{'Quantity'} =  $q;
     
     print "Spreadsheet Columns\n" if $verbose;
+<<<<<<< HEAD
         # Print the spreadsheet columns with hash keys from header labels
     print "==>";
     map {defined $GSvalues{$_}?print "$GSvalues{$_}, ": print "na, " } @GSheaders;
     print "\n";
+=======
+ #   map {defined $GSvalues{$_}?print "$_: $GSvalues{$_}, ": print "$_: na, " } @GSheaders;
+    print "==>";
+    map {defined $GSvalues{$_}?print "$GSvalues{$_}, ": print "na, " } @GSheaders;
+    print "\n";
+#    foreach (@GSheaders)
+#    {
+#        print "$_: $GSvalues{$_}; "
+#    }
+    
+#    # Fill in items from $inpStr - location, location 2, qty
+#    # Location	Location_2	Quantity
+#    unless (exists $partLoc{$part})
+#    {
+#        print "WARNING: This part: $part, doesn't exist in the hash.\n";
+#    }
+#    
+#    my ($l, $l2, $q) = @{$partLoc{$part}};
+#    print "part: $part, Loc: $l, Loc2: $l2, Qty: $q\n";
+#    $GSvalues{'Location'} =  $l;
+#    $GSvalues{'Location_2'} =  $l2;
+#    $GSvalues{'Quantity'} =  $q;
+>>>>>>> origin/master
     
 } # getPart
 
@@ -498,4 +577,9 @@ sub printResult
 #    TRANS	BJT	MOSFET							
 #    WIRE	MAGNET								
 #    XFRMR	LF (line freq)	SMF (switch-mode freq)	RF						
+<<<<<<< HEAD
 #    HWR	STANDOFF
+=======
+#    HWR	STANDOFF								
+#
+>>>>>>> origin/master

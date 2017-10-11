@@ -34,9 +34,10 @@ print "command line input: $pnum\n" if $pnum;
 
 my $verbose; # default 0 - Print everything
 
+# Location,Location 2,Quantity,Item
+
 my $inStr = 
-"Location,Location 2,Quantity,Item
-Euler 229 Teaching Lab,,20,1N5235BTR
+"Euler 229 Teaching Lab,,20,1N5235BTR
 Euler 229 Teaching Lab,,10,1N5251B
 Euler 229 Teaching Lab,,25,1N5819
 Euler 229 Teaching Lab,,25,512-1N5231B
@@ -114,84 +115,43 @@ Euler 229 Teaching Lab,,10,PJ-102AH
 Euler 229 Teaching Lab,,9,220ADC16
 Euler 229 Teaching Lab,,50,TL1105FF100Q";
 
-<<<<<<< Updated upstream
-=======
-my @mpn; # Manufacturers part number
->>>>>>> Stashed changes
 my @lines = split "\n", $inStr;
 my %partLoc = (); # Part location based on array above
-#map {my ($rm, $loc, $qty, $partx) = split ',', $_;
-#        # Make the part the key to an array of room, loc & qty
-#        $rm = 'rm na' unless($rm);
-#        $loc = 'loc na' unless($loc);
-#        $qty = 'qty na' unless($qty);
-##        $rm?$rm:'rm na'; 
-##        $loc?$loc:'loc na';
-##        $qty?$qty:'qty na';
-#          $partLoc{$partx} = ($rm, $loc, $qty)  } @lines;
-<<<<<<< Updated upstream
-my $rm; my $loc; my $qty; my $partx;       
-foreach (@lines)
-{
-    ($rm, $loc, $qty, $partx) = split ",", $_;
-=======
-# my $rm; my $loc; my $qty; my $partx;       
+my @partsOrder = (); # ordering of parts in the input spreadsheet file
+       
 foreach (@lines)
 {
     my ($rm, $loc, $qty, $partx) = split ",", $_;
->>>>>>> Stashed changes
         # Make the part the key to an array of room, loc & qty
     $rm = 'rm na' unless($rm);
     $loc = 'loc na' unless($loc);
     $qty = 'qty na' unless($qty);
-    
-<<<<<<< Updated upstream
-    print "$partx: $rm, $loc, $qty\n";
-#        $rm?$rm:'rm na'; 
-#        $loc?$loc:'loc na';
-#        $qty?$qty:'qty na';
-    $partLoc{$partx} = ($rm, $loc, $qty); 
+        # keep ordered list of the part names
+    push @partsOrder, $partx;
+        # Put array in hash indexed by part name
+    $partLoc{$partx} = [($rm, $loc, $qty)]; 
 }
-          
-map {my ($l, $l2, $q) = $partLoc{$_}; print "key: $_: $l, $l2, $q\n"; } keys %partLoc;
-
+    # test group of part names
 my @mpn = qw( 1N5235BTR 1N5251B 1N5819 512-1N5231B 1N5231B);
-=======
-#    print "$partx: $rm, $loc, $qty\n";
-#        $rm?$rm:'rm na'; 
-#        $loc?$loc:'loc na';
-#        $qty?$qty:'qty na';
-    push @mpn, $partx unless scalar @mpn > 10;
-    $partLoc{$partx} = [($rm, $loc, $qty)]; # need to reference address of array
-}
-          
-# map {my ($l, $l2, $q) = @{$partLoc{$_}}; print "key: $_: $l, $l2, $q\n"; } keys %partLoc;
 
-    print "MPNs: ";
-    @mpn = qw( 1N5235BTR 1N5251B  1N5231B
-                     1N5819 1N4148W-TP
-                    BZX85B5V1-TR 551-0207F);
-    map {print "$_, "} @mpn;
-    print "\n";
->>>>>>> Stashed changes
-#    if($pnum) # if argument found put it in @mpn
-#    {
-        @mpn =  ($pnum) if $pnum;
-#    }
+@mpn = @partsOrder;
+print "\n____Parts\n";
+map { print "$_ "} @mpn;
+print "\n____End Parts\n";
+
+    # If a part is in the command line
+@mpn =  ($pnum) if $pnum;
 
 # ordering for the GS header
-my @GSheaders = qw(Value	Item	Description	MPN	
+my @GSheaders = qw(Value    Search	Item	Description	MPN	
                     Manufacturer  Vendor_PN	Vendor	Category	
                     Type	Location	Location_2	Quantity);	
+    # Hash for the values of each row of spreadsheet
 my %GSvalues = ();
 print "GSheader: " if $verbose;
 map {print $_, ', '} @GSheaders; # if $verbose;
 print "\n";
-#        foreach (@GSheaders)
-#        {
-#            print $_, ", ";
-#        }
-#        print "\n";
+    # May be used for categories/classes later
 my @partClassArray = (
 'ADAPTER','BAT','CAP','CBL','CON',
 'DIODE','DISP','ELEC-MECH','HDR',
@@ -201,20 +161,14 @@ my @partClassArray = (
 'SPKR','SW','TERM-BLCK','TRANS',
 'WIRE','XFRMR','HWR',
 );
+    # Narrow down the list of seller to these vendors
 my @sellerList = (
-    'Newark',
-    'Digi-Key',
-    'Mouser', 
-    'Arrow',
-    'element14',
+    'Newark', 'Digi-Key', 'Mouser', 'Arrow', 'element14',
 );
 print "Seller list: " if $verbose;
 map {print $_, ", "} @sellerList if $verbose;
-#        for (@sellerList)
-#        {
-#          print $_, ", ";
-#        }
 print "\n";
+    # Init data structures 
 my @Category_UIDS = ();
 my @Categories = (); # Text 
 my @Descriptions = ();
@@ -231,33 +185,26 @@ my @Specifications = ();
 #	> -d include[]=descriptions
 # my $octopart;
 # $uri->query_form( $key1 => $val1, $key2 => $val2, ... )
-
+    # Create Octopart object
 my $octopart = REST::Client->new({
-	host => 'http://octopart.com',
-#	'pretty_print' => 'true',
-#	'apikey' => "4ed77e1e",
-#	queries => "[{\"mpn\":\"2n7000\"}]", 
-});
+        host => 'http://octopart.com',
+        'pretty_print' => 'true',
+    });
 
 foreach (@mpn)
 {
-    %GSvalues = ();
+    %GSvalues = (); # Init for next spreadsheet row
     print "\nRequest information on: $_\n" if $verbose;
-    getPart($_);
-    sleep(0.5); # Avoid rate limit (in msec)
+    getPart($_); # Get the information
+    sleep(0.5); # Avoid Octopart rate limit (in msec)
 }
-
 print "\n*********************************** end program $0  program.***********************************\n";
 
 #____________________________________________________________
 
 sub getPart
 {
-    my $part = shift;
-
- #   $octopart->buildQuery({'pretty_print'=>'true'});
-    # $octopart->GET('/api/v3/parts/match?apikey=4ed77e1e&queries=[{"mpn":"2n7000"}]&pretty_print=true');
-    # $octopart->GET("/api/v3/parts/match?apikey=4ed77e1e&queries=[{\"mpn\":\"$part\"}]");
+    my $part = shift;   # Get part name
     $octopart->GET('/api/v3/parts/match'
                     . '?' . 'apikey=4ed77e1e'
                     . '&' . "queries=[{\"mpn\":\"$part\"}]"
@@ -270,21 +217,13 @@ sub getPart
                     . '&' . 'include[]=imagesets'
                     . '&' . 'pretty_print=true'
                     );
-    # $octopart->GET('/api/v3/parts/match', {'apikey' => '4ed77e1e'});
-    # $octopart->request('GET', 'http://octopart.com/api/v3/parts/match', 'request body content');
     my $rc = $octopart->responseCode(); # Get response code
- #   print "\nHTTP request responseCode: ", $octopart->responseCode(), "\n"; # if $verbose;
     print "\nHTTP request responseCode: ", $rc, "\n" if $verbose;
- #   if($octopart->responseCode() == '429') # Hit rate limit of 3 requests per second
     if($rc == 429) # Hit rate limit of 3 requests per second
     {
         print "Hit rage limit!";
 #        sleep(1);
     }
-    # print $octopart->responseCode();
-     #   print "\nStart responseContent\n";
-     #   print $octopart->responseContent();
-     #   print "\nEnd responseContent\n";
 
     my $json = JSON->new->allow_nonref;
     my $jsonDecode = $json->decode($octopart->responseContent());
@@ -298,27 +237,18 @@ sub getPart
 #        msec	     The server response 
 #                    time in milliseconds	  234	                         n/a
 
-    #    print "millisec: ", $jsonDecode->{"msec"}, "\n";
-    #    print "CLASS: ", $jsonDecode->{"__class__"}, "\n";
-
-    # print "millisec: ", $PartsMatchResponse->{"msec"}, "\n";
     printResult("millisec: ", $PartsMatchResponse->{"msec"}) if $verbose;
-    # print "CLASS: ", $PartsMatchResponse->{"__class__"}, "\n";
     printResult("CLASS: ", $PartsMatchResponse->{"__class__"}) if $verbose;
 
     my $PartsMatchRequest = $PartsMatchResponse->{"request"};
-    # print "Request: ", $PartsMatchResponse->{"request"}->{"__class__"}, "\n";
     printResult("Request: ", $PartsMatchRequest->{"__class__"}) if $verbose;
 
     my $PartsMatchQuery = $PartsMatchRequest->{"queries"};
-
-    # print "Request for mpn: ", $PartsMatchResponse->{"request"}->{"queries"}[0]->{"mpn"}, "\n";
     printResult("Request for mpn: ", $PartsMatchQuery->[0]->{"mpn"}) if $verbose;
     printResult("Request for seller: ", $PartsMatchQuery->[0]->{"seller"}) if $verbose;
     printResult("Request for brand: ", $PartsMatchQuery->[0]->{"brand"}) if $verbose;
 
     my $PartsMatchResult = $PartsMatchResponse->{"results"};
-    # print "Results: ", $PartsMatchResponse->{"results"}[0]->{"__class__"}, "\n";
     printResult("Results: ", $PartsMatchResult->[0]->{"__class__"}) if $verbose;
     printResult("Results hits: ", $PartsMatchResult->[0]->{"hits"}) if $verbose;
     printResult("Results error: ", $PartsMatchResult->[0]->{"error"}) if $verbose;
@@ -339,7 +269,6 @@ sub getPart
     # only call getCategory once
     getCategory($json, $Category_UIDS[0]);
     $GSvalues{'Category'} =  $Categories[0];
-#    getCategory($json, $Category_UIDS[0]);
 
 #    foreach my $c (@Category_UIDS)
 #    {
@@ -362,10 +291,6 @@ sub getPart
     
     print "\nNumber of Sorted Categories: ", scalar @unique, "\n" if $verbose;
     map {print "all sorted categories: $_\n"} @unique if $verbose;
-#    foreach my $s (@unique)
-#    {
-#        print "all sorted categories: $s\n";
-#    }
     #____________________________
 #    print "\nNumber of Specs: ", scalar @Specifications, "\n";
 #    foreach my $s (@Specifications)
@@ -379,11 +304,6 @@ sub getPart
     
     print "\nNumber of Sorted Specs: ", scalar @unique, "\n" if $verbose;
     map {print "all sorted spec: $_\n"} @unique if $verbose;
-    
-#    foreach my $s (@unique)
-#    {
-#        print "all sorted spec: $s\n";
-#    }
     #____________________________
 #    print "\nNumber of Desc: ", scalar @Descriptions, "\n";
 #    foreach my $d (@Descriptions)
@@ -395,10 +315,6 @@ sub getPart
     @unique = sort keys %hashput;
     print "\nNumber of Sorted Desc: ", scalar @unique, "\n" if $verbose;
     map {print "all sorted desc: $_\n"} @unique if $verbose;
-#    foreach my $d (@unique)
-#    {
-#        print "all sorted desc: $d\n";
-#    }
     #____________________________
     
 #    print "\nNumber of Short Desc: ", scalar @Short_Descriptions, "\n";
@@ -406,53 +322,35 @@ sub getPart
 #    {
 #        print "all short desc: $d\n";
 #    }
-    %hashput = ();
-    @hashput{@Short_Descriptions} = ();
-    @unique = sort keys %hashput;
-    
-    print "\nNumber of Sorted Short Desc: ", scalar @unique, "\n" if $verbose;
-    map {print "all sorted short desc: $_\n"} @unique if $verbose;
-#    foreach my $d (@unique)
-#    {
-#        print "all sorted short desc: $d\n";
-#    }
+    unless(scalar @Short_Descriptions)
+    {
+        %hashput = ();
+        @hashput{@Short_Descriptions} = ();
+        @unique = sort keys %hashput;
+        print "\nNumber of Sorted Short Desc: ", scalar @unique, "\n" if $verbose;
+        map {print "all sorted short desc: $_\n"} @unique if $verbose;
+    }
     #____________________________
     
-<<<<<<< Updated upstream
-=======
     # Fill in items from $inpStr - location, location 2, qty
     # Location	Location_2	Quantity
+    unless (exists $partLoc{$part})
+    {
+        print "WARNING: This part: $part, doesn't exist in the hash.\n";
+        return;
+    }
+    
     my ($l, $l2, $q) = @{$partLoc{$part}};
-    # print "part: $part, Loc: $l, Loc2: $l2, Qty: $q\n";
+    $GSvalues{'Search'} = $part;
     $GSvalues{'Location'} =  $l;
     $GSvalues{'Location_2'} =  $l2;
     $GSvalues{'Quantity'} =  $q;
     
->>>>>>> Stashed changes
     print "Spreadsheet Columns\n" if $verbose;
- #   map {defined $GSvalues{$_}?print "$_: $GSvalues{$_}, ": print "$_: na, " } @GSheaders;
+        # Print the spreadsheet columns with hash keys from header labels
+    print "==>";
     map {defined $GSvalues{$_}?print "$GSvalues{$_}, ": print "na, " } @GSheaders;
     print "\n";
-#    foreach (@GSheaders)
-#    {
-#        print "$_: $GSvalues{$_}; "
-#    }
-    
-    # Fill in items from $inpStr - location, location 2, qty
-    # Location	Location_2	Quantity
-<<<<<<< Updated upstream
-    my ($l, $l2, $q) = $partLoc{$part};
-    print "part: $part, Loc: $l, Loc2: $l2, Qty: $q\n";
-    $GSvalues{'Location'} =  $l;
-    $GSvalues{'Location_2'} =  $l2;
-    $GSvalues{'Quantity'} =  $q;
-=======
-#    my ($l, $l2, $q) = @{$partLoc{$part}};
-#    print "part: $part, Loc: $l, Loc2: $l2, Qty: $q\n";
-#    $GSvalues{'Location'} =  $l;
-#    $GSvalues{'Location_2'} =  $l2;
-#    $GSvalues{'Quantity'} =  $q;
->>>>>>> Stashed changes
     
 } # getPart
 
@@ -468,16 +366,11 @@ sub getCategory
 #                    . '&' . "queries=[{\"$c\"}]"
 #                    );
     unless ($octopart->responseCode() ==200){
-    print "HTTP request category responseCode: ", $octopart->responseCode(), "\n";
+        print "HTTP request category responseCode: ", $octopart->responseCode(), "\n";
     }
-    # print $octopart->responseCode();
-#        print "\nStart category\n";
-#        print $octopart->responseContent();
+
         my $Category = $json->decode($octopart->responseContent());
-#        print "\n";
-#        print "Category name: ", $Category->{'name'}, "\n";
         push @Categories, $Category->{'name'};
-#        print "\nEnd category\n";
         
         # Sample category data structure
  #       {"ancestor_names": ["Electronic Parts", "Passive Components", "Resistors"], "uid": "91ee5ce4a8204a29", "num_parts": 708565, "ancestor_uids": ["8a1e4714bb3951d9", "7542b8484461ae85", "5c6a91606d4187ad"], "children_uids": [], "__class__": "Category", "parent_uid": "5c6a91606d4187ad", "name": "Through-Hole Resistors"}      
@@ -514,12 +407,6 @@ sub getItems
     map {printResult("    Description: ", $_->{'value'});
          push @Descriptions, $_->{'value'}; 
         } @$Description if $verbose;
-         
-#    foreach my $d (@$Description)
-#    {
-#        printResult("    Description: ", $d->{'value'});
-#        push @Descriptions, $d->{'value'};     
-#    } # foreach my $d (@$Description)
 
     unless ($_) # use only the first mfg part values for now
     {
@@ -527,7 +414,7 @@ sub getItems
                         MPN => $Part->[$_]->{'mpn'},
                         Manufacturer => $Manufacturer->{'name'},
                         Description => $Part->[$_]->{'short_description'},
-                        );
+                    );
     } # unless ($_)
     
     my $Partspecs = $Part->[$_]->{'specs'};
@@ -536,7 +423,6 @@ sub getItems
         my $v = $val->{'display_value'};
         print "       spec: ", $key, ": ", $v?$v:'NULL', "\n" if $verbose;
         my $tmp = sprintf "%s%s%s", $key , ": " , $v?$v:'NULL';
- #       print $tmp, "\n";
         push @Specifications, $tmp; # Collect specs
         if($key eq "mounting_style")
         {
@@ -552,20 +438,15 @@ sub getItems
     }   
     
     my $Offers = $Part->[$_]->{'offers'};
-    
     foreach my $o (@$Offers)
     {      
         my $seller = $o->{'seller'}; # get seller object
-#        my @matches = grep /$seller->{'name'}/, @sellerList;
-#       for (@matches)
         for (grep /$seller->{'name'}/i, @sellerList)
             {
               print "          Seller Matches: ", $_, "\n"  if $verbose;
             }
-        
         print "           Seller: ", $seller->{'name'} if $verbose;
         print ", PartOffer sku: ", $o->{'sku'}, "\n" if $verbose;
-        
         unless ($_) # use only the first mfg part values for now
         {
             $GSvalues{'Vendor'} = $seller->{'name'};
@@ -580,7 +461,6 @@ sub getItems
             print "            quantity: ", $qty1->[0], ", price: ", $qty1->[1], "\n" if $verbose;
         } 
     }   # foreach my $o (@$Offers)
-    
 } # sub getItems
 
 # Need to handle the case where result of query is a NULL object
@@ -589,8 +469,6 @@ sub printResult
     my ($str, $tmp) = @_;
     print $str, $tmp?$tmp:'NULL', "\n";
 } # sub printResult
-
-
 
 #    Class	Type1 for each Class								
 #    ADAPTER	AC-MAINS								
@@ -609,7 +487,7 @@ sub printResult
 #    MIC	ELECTRET								
 #    MODULE	ARDUINO								
 #    MOTOR	LEGO-M								
-#    PCB	LaserRcvr_Boost_board_v1.2	LaserRcvr_Output_board_v1.2	LedFob_r2d	Nano-CC-EL-ver-0.62	simple_ps_1v0				
+#    PCB	LaserRcvr_Boost_board_v1.2	LaserRcvr_Output_board_v1.2	LedFob_r2d	Nano-CC-EL-ver-0.62	simple_ps_1v0			
 #    PROTOTYPING	BREADBOARD WIRE KIT	SOLDERLESS BREADBOARD							
 #    PS	AC								
 #    RES	F (thin film)	TF (thick film)	CF (carbon film)	CdS	POT				
@@ -620,7 +498,4 @@ sub printResult
 #    TRANS	BJT	MOSFET							
 #    WIRE	MAGNET								
 #    XFRMR	LF (line freq)	SMF (switch-mode freq)	RF						
-#    HWR	STANDOFF								
-#
-
-
+#    HWR	STANDOFF

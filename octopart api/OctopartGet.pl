@@ -20,6 +20,7 @@ binmode STDOUT, ":utf8"; # get rid of warnings about special characters
 
 # HTTP Error Codes
 # 200 - Connected ok
+# 429 - Hit rate limit!
 # 500 Can't connect to Octopart - internet down?
 
 
@@ -32,7 +33,7 @@ print "\n*********************************** start program $0 program.**********
 my $pnum = shift;
 print "command line input: $pnum\n" if $pnum;
 
-my $verbose; # default 0 - Print everything
+my $verbose = 0; # default 0 - Print everything = 1
 
 # Location,Location 2,Quantity,Item
 
@@ -115,77 +116,105 @@ Euler 229 Teaching Lab,,10,PJ-102AH
 Euler 229 Teaching Lab,,9,220ADC16
 Euler 229 Teaching Lab,,50,TL1105FF100Q";
 
-my @lines = split "\n", $inStr;
+my $fname = 'inputdata.txt';
+open my $fhandle, '<', $fname or die $!;
+my @lines = (<$fhandle>); # grab entire file by lines into array
+close($fhandle);
+chomp(@lines); # get rid of last character, \n
+# map {print "$_ "} @lines;
+    # Number of part numbers (rows) input.
+print "Length of lines: ", scalar @lines, "\n";
+    # In the end the partCount should equal the number in @lines
+my $partCount = 1; # Count each part looked up for output line
+
+# Headers Example
+# *Item Searched	Item	Description	MPN	Manufacturer	Vendor PN	Vendor					Category	Type	Location	Location 2	Quantity	Item	
+# my @headersRow = qw (*Item Searched	Item	Description	MPN	Manufacturer	Vendor PN	Vendor					Category	Type	Location	Location 2	Quantity	Search);
+
+    # First row must be the column names! - Headers
+my @headersRow = split "\t", shift @lines;
+print "Headers: ";
+map {print "$_, "} @headersRow;
+print "\n";
+
+    # Need to know the index of each header name
+my %headerNameIndex;
+    # Put header names in as keys & indexes as values using slice
+@headerNameIndex{@headersRow} = (0..$#headersRow);
+
+foreach my $key (keys %headerNameIndex)
+{
+    print "header name: $key, index: $headerNameIndex{$key}\n";
+}
+# die "\nstop here\n";
+
 my %partLoc = (); # Part location based on array above
 my @partsOrder = (); # ordering of parts in the input spreadsheet file
-<<<<<<< HEAD
-       
-=======
-#map {my ($rm, $loc, $qty, $partx) = split ',', $_;
-#        # Make the part the key to an array of room, loc & qty
-#        $rm = 'rm na' unless($rm);
-#        $loc = 'loc na' unless($loc);
-#        $qty = 'qty na' unless($qty);
-##        $rm?$rm:'rm na'; 
-##        $loc?$loc:'loc na';
-##        $qty?$qty:'qty na';
-#          $partLoc{$partx} = ($rm, $loc, $qty)  } @lines;
-# my $rm; my $loc; my $qty; my $partx;       
->>>>>>> origin/master
+# Organize input information according to the header labels
+my $i = 0;
 foreach (@lines)
 {
-    my ($rm, $loc, $qty, $partx) = split ",", $_;
-        # Make the part the key to an array of room, loc & qty
-    $rm = 'rm na' unless($rm);
-    $loc = 'loc na' unless($loc);
-    $qty = 'qty na' unless($qty);
-<<<<<<< HEAD
-        # keep ordered list of the part names
+    my @rowOfFields = split "\t", $_; # split line on tabs
+    my $partx = $rowOfFields[1]; # *Item Searched field, index 1, second item
+    @rowOfFields = map { 'naI' unless($_)} @rowOfFields; # place 'na' in all unknown fields
+#    print "$i. ";
+#    map {print "$_ => "} @rowOfFields; # debug print
+#    print "\n";
+    $i++;
+        # Keep ordered list of part names
     push @partsOrder, $partx;
-        # Put array in hash indexed by part name
-    $partLoc{$partx} = [($rm, $loc, $qty)]; 
+        # Put part information in partLoc hash
+        # Store the address of @rowOfFields in hash location $partx
+    $partLoc{$partx} = [@rowOfFields];
+#    die "\nStop here!\n";
 }
+# die "\nStop here!\n";
+
+# Get all the lines by splitting on newline
+# @lines = split "\n", $inStr;
+#    my %partLoc = (); # Part location based on array above
+#    my @partsOrder = (); # ordering of parts in the input spreadsheet file
+
+# Loop for processing each part
+#foreach (@lines)
+#{
+#    # Get information already known about part
+#    # location, location 2, quantity, and part number
+#    my ($rm, $loc, $qty, $partx) = split ",", $_; # comma delimited
+# #   my ($rm, $loc, $qty, $partx) = split "\t", $_; # tab delimited
+#        # Make the part the key to an array of room, loc & qty
+#    $rm = 'rm na' unless($rm);
+#    $loc = 'loc na' unless($loc);
+#    $qty = 'qty na' unless($qty);
+#        # keep ordered list of the part names
+#    push @partsOrder, $partx;
+#        # Put array in hash indexed by part name
+#    $partLoc{$partx} = [($rm, $loc, $qty)]; 
+#}
     # test group of part names
-=======
-    push @partsOrder, $partx;
-#    print "$partx: $rm, $loc, $qty\n";
-#        $rm?$rm:'rm na'; 
-#        $loc?$loc:'loc na';
-#        $qty?$qty:'qty na';
-    $partLoc{$partx} = [($rm, $loc, $qty)]; 
-}
-
-# map {print "$_ "} @partsOrder;
-# print the information in the location & quantity hash
-#    map {my ($l, $l2, $q) = @{$partLoc{$_}}; 
-#            print "key: $_: $l, $l2, $q\n"; } keys %partLoc;
-
->>>>>>> origin/master
 my @mpn = qw( 1N5235BTR 1N5251B 1N5819 512-1N5231B 1N5231B);
 
 @mpn = @partsOrder;
 print "\n____Parts\n";
 map { print "$_ "} @mpn;
 print "\n____End Parts\n";
-<<<<<<< HEAD
 
     # If a part is in the command line
 @mpn =  ($pnum) if $pnum;
-=======
-#    if($pnum) # if argument found put it in @mpn
-#    {
-        @mpn =  ($pnum) if $pnum;
-#    }
->>>>>>> origin/master
 
 # ordering for the GS header
-my @GSheaders = qw(Value    Search	Item	Description	MPN	
-                    Manufacturer  Vendor_PN	Vendor	Category	
-                    Type	Location	Location_2	Quantity);	
-    # Hash for the values of each row of spreadsheet
+#    my @GSheaders = qw(Value    Search	Item	Description	MPN	
+#                        Manufacturer  Vendor_PN	Vendor	Category	
+#                        Type	Location	Location 2	Quantity);
+                    
+my @GSheaders = @headersRow;
+    # init Hash for the values of each row of spreadsheet
 my %GSvalues = ();
 print "GSheader: " if $verbose;
-map {print $_, ', '} @GSheaders; # if $verbose;
+    # Comma separated
+# map {print $_, ', '} @GSheaders; 
+    # Tab separated
+map {print $_, "\t"} @GSheaders; 
 print "\n";
     # May be used for categories/classes later
 my @partClassArray = (
@@ -223,17 +252,9 @@ my @Specifications = ();
 # $uri->query_form( $key1 => $val1, $key2 => $val2, ... )
     # Create Octopart object
 my $octopart = REST::Client->new({
-<<<<<<< HEAD
         host => 'http://octopart.com',
         'pretty_print' => 'true',
     });
-=======
-	host => 'http://octopart.com',
-	'pretty_print' => 'true',
-#	'apikey' => "4ed77e1e",
-#	queries => "[{\"mpn\":\"2n7000\"}]", 
-});
->>>>>>> origin/master
 
 foreach (@mpn)
 {
@@ -262,11 +283,11 @@ sub getPart
                     . '&' . 'pretty_print=true'
                     );
     my $rc = $octopart->responseCode(); # Get response code
-    print "\nHTTP request responseCode: ", $rc, "\n" if $verbose;
+    print "\nHTTP request part responseCode: ", $rc, "\n"; # if $verbose;
     if($rc == 429) # Hit rate limit of 3 requests per second
     {
-        print "Hit rage limit!";
-#        sleep(1);
+        print "Hit rate limit! \n";
+        sleep(1);
     }
 
     my $json = JSON->new->allow_nonref;
@@ -301,18 +322,20 @@ sub getPart
     my $Part = $PartsMatchResult->[0]->{"items"};
     printResult("Number in items (parts) array: ", scalar @{$Part}) if $verbose;
 
-    for (my $i=0; $i < scalar @{$Part} ;$i++)
+    if($Part)
     {
-        getItems($Part, $i);
+        for (my $i=0; $i < scalar @{$Part} ;$i++)
+        {
+            getItems($Part, $i);
+        }
     }
-
 #    foreach my $c (@Category_UIDS)
 #    {
 #        getCategory($json, $c);
 #    }
     # only call getCategory once
-    getCategory($json, $Category_UIDS[0]);
-    $GSvalues{'Category'} =  $Categories[0];
+    getCategory($json, $Category_UIDS[0]) if ($Category_UIDS[0]);
+    $GSvalues{'Category'} =  $Categories[0] if $Categories[0];
 
 #    foreach my $c (@Category_UIDS)
 #    {
@@ -329,36 +352,43 @@ sub getPart
         # http://www.perlmonks.org/?node_id=604547
         # Hash slices explained
         # http://www.webquills.net/web-development/perl/perl-5-hash-slices-can-replace.html
-    my %hashput;
-    @hashput{@Categories} = (); # use hash keys to get rid of dups
-    my @unique = sort keys %hashput; # unique sorted specs
-    
-    print "\nNumber of Sorted Categories: ", scalar @unique, "\n" if $verbose;
-    map {print "all sorted categories: $_\n"} @unique if $verbose;
+    my (%hashput, @unique);
+    unless(@Categories)
+    {
+        %hashput;
+        @hashput{@Categories} = (); # use hash keys to get rid of dups
+        @unique = sort keys %hashput; # unique sorted specs
+        print "\nNumber of Sorted Categories: ", scalar @unique, "\n" if $verbose;
+        map {print "all sorted categories: $_\n"} @unique if $verbose;
+    }
     #____________________________
 #    print "\nNumber of Specs: ", scalar @Specifications, "\n";
 #    foreach my $s (@Specifications)
 #    {
 #        print "all spec: $s\n";
 #    }
-    
-    %hashput = ();
-    @hashput{@Specifications} = ();
-    @unique = sort keys %hashput;
-    
-    print "\nNumber of Sorted Specs: ", scalar @unique, "\n" if $verbose;
-    map {print "all sorted spec: $_\n"} @unique if $verbose;
+    unless(scalar @Specifications)
+    {
+        %hashput = ();
+        @hashput{@Specifications} = ();
+        @unique = sort keys %hashput;
+        print "\nNumber of Sorted Specs: ", scalar @unique, "\n" if $verbose;
+        map {print "all sorted spec: $_\n"} @unique if $verbose;
+    }
     #____________________________
 #    print "\nNumber of Desc: ", scalar @Descriptions, "\n";
 #    foreach my $d (@Descriptions)
 #    {
 #        print "all desc: $d\n";
 #    }
-    %hashput = ();
-    @hashput{@Descriptions} = ();
-    @unique = sort keys %hashput;
-    print "\nNumber of Sorted Desc: ", scalar @unique, "\n" if $verbose;
-    map {print "all sorted desc: $_\n"} @unique if $verbose;
+    unless(scalar @Descriptions)
+    {
+        %hashput = ();
+        @hashput{@Descriptions} = ();
+        @unique = sort keys %hashput;
+        print "\nNumber of Sorted Desc: ", scalar @unique, "\n" if $verbose;
+        map {print "all sorted desc: $_\n"} @unique if $verbose;
+    }
     #____________________________
     
 #    print "\nNumber of Short Desc: ", scalar @Short_Descriptions, "\n";
@@ -374,13 +404,6 @@ sub getPart
         print "\nNumber of Sorted Short Desc: ", scalar @unique, "\n" if $verbose;
         map {print "all sorted short desc: $_\n"} @unique if $verbose;
     }
-<<<<<<< HEAD
-=======
-#    foreach my $d (@unique)
-#    {
-#        print "all sorted short desc: $d\n";
-#    }
->>>>>>> origin/master
     #____________________________
     
     # Fill in items from $inpStr - location, location 2, qty
@@ -391,45 +414,29 @@ sub getPart
         return;
     }
     
-    my ($l, $l2, $q) = @{$partLoc{$part}};
-<<<<<<< HEAD
-=======
- #   print "part: $part, Loc: $l, Loc2: $l2, Qty: $q\n";
->>>>>>> origin/master
-    $GSvalues{'Search'} = $part;
-    $GSvalues{'Location'} =  $l;
-    $GSvalues{'Location_2'} =  $l2;
-    $GSvalues{'Quantity'} =  $q;
-    
-    print "Spreadsheet Columns\n" if $verbose;
-<<<<<<< HEAD
-        # Print the spreadsheet columns with hash keys from header labels
-    print "==>";
-    map {defined $GSvalues{$_}?print "$GSvalues{$_}, ": print "na, " } @GSheaders;
-    print "\n";
-=======
- #   map {defined $GSvalues{$_}?print "$_: $GSvalues{$_}, ": print "$_: na, " } @GSheaders;
-    print "==>";
-    map {defined $GSvalues{$_}?print "$GSvalues{$_}, ": print "na, " } @GSheaders;
-    print "\n";
-#    foreach (@GSheaders)
-#    {
-#        print "$_: $GSvalues{$_}; "
-#    }
-    
-#    # Fill in items from $inpStr - location, location 2, qty
-#    # Location	Location_2	Quantity
-#    unless (exists $partLoc{$part})
-#    {
-#        print "WARNING: This part: $part, doesn't exist in the hash.\n";
-#    }
-#    
 #    my ($l, $l2, $q) = @{$partLoc{$part}};
-#    print "part: $part, Loc: $l, Loc2: $l2, Qty: $q\n";
+#    $GSvalues{'Search'} = $part;
 #    $GSvalues{'Location'} =  $l;
 #    $GSvalues{'Location_2'} =  $l2;
 #    $GSvalues{'Quantity'} =  $q;
->>>>>>> origin/master
+    
+    my @partRow = @{$partLoc{$part}};
+    $GSvalues{'Search'} = $part;
+    $GSvalues{'Location'} =  $partRow[$headerNameIndex{'Location'}];
+    $GSvalues{'Location 2'} =  $partRow[$headerNameIndex{'Location 2'}];
+    $GSvalues{'Quantity'} =  $partRow[$headerNameIndex{'Quantity'}];
+    
+    
+    print "Spreadsheet Columns\n" if $verbose;
+
+        # Print the spreadsheet columns with hash keys from header labels
+    print "$partCount *==>";
+    $partCount++;
+        # Comma separated
+ #   map {defined $GSvalues{$_}?print "$GSvalues{$_}, ": print "na, " } @GSheaders;
+        # Tab separated
+    map {defined $GSvalues{$_}?print "$GSvalues{$_}\t": print "naO\t" } @GSheaders;
+    print "\n";
     
 } # getPart
 
@@ -445,7 +452,7 @@ sub getCategory
 #                    . '&' . "queries=[{\"$c\"}]"
 #                    );
     unless ($octopart->responseCode() ==200){
-        print "HTTP request category responseCode: ", $octopart->responseCode(), "\n";
+        print "HTTP request category responseCode: ", $octopart->responseCode(), " Category: ", $c, "\n";
     }
 
         my $Category = $json->decode($octopart->responseContent());
@@ -577,9 +584,4 @@ sub printResult
 #    TRANS	BJT	MOSFET							
 #    WIRE	MAGNET								
 #    XFRMR	LF (line freq)	SMF (switch-mode freq)	RF						
-<<<<<<< HEAD
 #    HWR	STANDOFF
-=======
-#    HWR	STANDOFF								
-#
->>>>>>> origin/master

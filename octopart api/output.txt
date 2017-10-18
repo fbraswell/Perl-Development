@@ -1,0 +1,128 @@
+
+*********************************** start program OctopartGet.pl program.***********************************
+Length of lines: 78
+Headers: Value, *Item Searched, Item, Description, MPN, Manufacturer, Vendor PN, Vendor, , , , , Category, Type, Location, Location 2, Quantity, Search, , , 
+header name: Location 2, index: 15
+header name: , index: 18
+header name: Vendor PN, index: 6
+header name: Vendor, index: 7
+header name: Type, index: 13
+header name: Search, index: 17
+header name: Location, index: 14
+header name: Manufacturer, index: 5
+header name: Quantity, index: 16
+header name: *Item Searched, index: 1
+header name: MPN, index: 4
+header name: Value, index: 0
+header name: Item, index: 2
+header name: Description, index: 3
+header name: Category, index: 12
+header name: , index: 19
+
+____Parts
+1-2199298-2 1-2199298-3 100F5T-YT-SRY-WH 100F5T-YT-WH-WH 10A2-B 158-P02EK381V2-E 1N4001-TP 1N4004-T 1N4148W-TP 1N5231B 1N5235BTR 1N5251B 1N5819 220ADC16 271-1.0M-RC 271-10-RC 271-100-RC 271-100K-RC 271-10K-RC 271-1K-RC 271-200K-RC 271-20K-RC 271-220-RC 271-2K-RC 271-47-RC 271-49.9K-RC 291-5.1-RC 291-560-RC 2N3904TAR 2N7000TA 551-0207F 551-0407F AI-155 BAT-HLD-001 BCAP0050 P270 T01 BZX85B5V1-TR CMB-6544PF CR2032 Battery D103M29Z5UH6UJ5R ECA-1HM100I ERJ-6ENF1002V ERJ-6ENF1004V ESH105M050AC3AA ESH225M050AC3AA FK24X7R1H105K H102K25X7RL63J5R K102K15X7RF5TL2 K104K15X7RF53H5 LF-5WAEMBGMBC LM358AP LM4040D25ILPR LM78L05ACZX LTL2R3KRD-EM LTL2R3KYD-EM MF1/4DC1R00F MFR-25FBF52-10R MFR-25FRF52-20K MJE3055TTU PJ-102AH RDE5C2A101J0M1H03A REA010M2CBK-0511P REA101M1EBK-0611P REA101M1HBK-0811P RGA4R7M1HBK-0511G SLX-LX5093GD SN74HC00N SN74HC02N SN74HC244N SPX1117M3-L-3-3/TR SSL-LX5093USBD T73XW203KT20 TL1105FF100Q TL431CZ-AP UPW1A222MHD USF1V150MDD UVR1E471MPD UVR1HR22MDD 
+____End Parts
+Value	*Item Searched	Item	Description	MPN	Manufacturer	Vendor PN	Vendor					Category	Type	Location	Location 2	Quantity	Search			
+
+1 *==>naO	1-2199298-2	1-2199298-2	8 Position Dual Wipe Ladder Style DIP IC Socket 0.3" Wide 0.1" Pitch	1-2199298-2	TE Connectivity	naO	Heilind Asia	naO	naO	naO	naO	naO	Vertical	Euler 229 Teaching Lab	A16D	4	1-2199298-2	naO	naO	
+2 *==>naO	1-2199298-3	1-2199298-3	14 Position Dual Wipe Ladder Style DIP IC Socket 0.3" Wide 0.1" Pitch	1-2199298-3	TE Connectivity	naO	Heilind Asia	naO	naO	naO	naO	naO	Vertical	Euler 229 Teaching Lab	A16D	20	1-2199298-3	naO	naO	
+3 *==>naO	100F5T-YT-SRY-WH	100F5T-YT-SRY-WH	naO	naO	naO	naO	naO	naO	naO	naO	naO	naO	naO	Euler 229 Teaching Lab	A16C	50	100F5T-YT-SRY-WH	naO	naO	
+4 *==>naO	100F5T-YT-WH-WH	100F5T-YT-WH-WH	naO	naO	naO	naO	naO	naO	naO	naO	naO	naO	naO	Euler 229 Teaching Lab	A16C	50	100F5T-YT-WH-WH	naO	naO	
+5 *==>naO	10A2-B	10A2-B	naO	10A2-B	Rectron	naO	Mouser	naO	naO	naO	naO	Rectifier Diodes	Through Hole	Euler 229 Teaching Lab	A16D	3	10A2-B	naO	naO	
+6 *==>naO	158-P02EK381V2-E	158-P02EK381V2-E	naO	naO	naO	naO	naO	naO	naO	naO	naO	Rectifier Diodes	naO	Euler 229 Teaching Lab	naI	10	158-P02EK381V2-E	naO	naO	
+7 *==>naO	1N4001-TP	1N4001-TP	1N4001 Series 1 A 400 V Through-Hole Rectifying Diode - DO-41	1N4001-TP	MCC	naO	Florida Circuit	naO	naO	naO	naO	Rectifier Diodes	Through Hole	Euler 229 Teaching Lab	A16D	50	1N4001-TP	naO	naO	
+8 *==>naO	1N4004-T	1N4004-T	1N4004 Series 400 V 1 A Through Hole High Current Standard Rectifier - DO-41	1N4004-T	Diodes Inc.	naO	Abacus Technologies	naO	naO	naO	naO	Rectifier Diodes	Through Hole	Euler 229 Teaching Lab	A16D	50	1N4004-T	naO	naO	
+9 *==>naO	1N4148W-TP	833-1N4148W-TP	1N4148W Series 100 V 150 mA 4 ns SMT High Speed Switching Diode - SOD-123	1N4148W-TP	MCC	naO	ChipNet	naO	naO	naO	naO	Rectifier Diodes	Surface Mount	Euler 229 Teaching Lab	A16D	50	1N4148W-TP	naO	naO	
+10 *==>naO	1N5231B	512-1N5231B	Diode Zener Single 5.1 Volt 5% 500m Watt 2-Pin DO-35 Bulk	1N5231B	Fairchild Semiconductor	naO	Abacus Technologies	naO	naO	naO	naO	Rectifier Diodes	Axial	Euler 229 Teaching Lab	A16D	25	1N5231B	naO	naO	
+11 *==>naO	1N5235BTR	1N5235BTR	1N5235B Series 500 mW 6.8 V 5 % Tolerance Through Hole Zener Diode -DO-35	1N5235B-TR	Vishay	naO	NAC Semi	naO	naO	naO	naO	Rectifier Diodes	Through Hole	Euler 229 Teaching Lab	A16D	20	1N5235BTR	naO	naO	
+12 *==>naO	1N5251B	1N5251B	Diode Zener Single 22V 5% 500mW 2-Pin DO-35 Bulk	1N5251B	Fairchild Semiconductor	naO	Abacus Technologies	naO	naO	naO	naO	Rectifier Diodes	Through Hole	Euler 229 Teaching Lab	A16D	10	1N5251B	naO	naO	
+13 *==>naO	1N5819	1N5819	1N5819 Series Low Drop Power 1 A 40 V Schottky Rectifier Through Hole - DO-41	1N5819	STMicroelectronics	naO	TME	naO	naO	naO	naO	Rectifier Diodes	Through Hole	Euler 229 Teaching Lab	A16D	25	1N5819	naO	naO	
+14 *==>naO	220ADC16	220ADC16	Switch DIP N.O./N.C. SP16T 16 Shaft 0.1A 50VDC PC Pins 10000Cycles 2.54mm Thru-Hole Tube	220ADC16	CTS Components	naO	LTL Group	naO	naO	naO	naO	Rectifier Diodes	Through Hole	Euler 229 Teaching Lab	A16D	9	220ADC16	naO	naO	
+15 *==>naO	271-1.0M-RC	271-1.0M-RC	naO	271-1.0M-RC	Xicon	naO	Ralph's Industrial Electronics	naO	naO	naO	naO	Rectifier Diodes	Axial	Euler 229 Teaching Lab	A16A	50	271-1.0M-RC	naO	naO	
+16 *==>naO	271-10-RC	271-10-RC	naO	27110RC	Xicon	naO	naO	naO	naO	naO	naO	Rectifier Diodes	Axial	Euler 229 Teaching Lab	A16A	50	271-10-RC	naO	naO	
+17 *==>naO	271-100-RC	271-100-RC	naO	271100RC	Xicon	naO	naO	naO	naO	naO	naO	Rectifier Diodes	Axial	Euler 229 Teaching Lab	A16A	50	271-100-RC	naO	naO	
+*________ HTTP request part responseCode: 429 Hit rate limit!
+*======== HTTP request category responseCode: 429 Category: c85a0550f9be139d
+18 *==>naO	271-100K-RC	271-100K-RC	naO	naO	naO	naO	naO	naO	naO	naO	naO	Rectifier Diodes	naO	Euler 229 Teaching Lab	A16A	50	271-100K-RC	naO	naO	
+*________ HTTP request part responseCode: 429 Hit rate limit!
+*======== HTTP request category responseCode: 429 Category: c85a0550f9be139d
+19 *==>naO	271-10K-RC	271-10K-RC	naO	naO	naO	naO	naO	naO	naO	naO	naO	Rectifier Diodes	naO	Euler 229 Teaching Lab	A16A	50	271-10K-RC	naO	naO	
+*________ HTTP request part responseCode: 429 Hit rate limit!
+20 *==>naO	271-1K-RC	271-1K-RC	naO	naO	naO	naO	naO	naO	naO	naO	naO	Rectifier Diodes	naO	Euler 229 Teaching Lab	A16A	50	271-1K-RC	naO	naO	
+21 *==>naO	271-200K-RC	271-200K-RC	naO	naO	naO	naO	naO	naO	naO	naO	naO	Rectifier Diodes	naO	Euler 229 Teaching Lab	A16A	50	271-200K-RC	naO	naO	
+22 *==>naO	271-20K-RC	271-20K-RC	naO	271-20K-RC	Xicon	naO	Quest	naO	naO	naO	naO	Rectifier Diodes	Axial	Euler 229 Teaching Lab	A16A	50	271-20K-RC	naO	naO	
+23 *==>naO	271-220-RC	271-220-RC	naO	naO	naO	naO	naO	naO	naO	naO	naO	Rectifier Diodes	naO	Euler 229 Teaching Lab	A16A	25	271-220-RC	naO	naO	
+24 *==>naO	271-2K-RC	271-2K-RC	naO	271-2K-RC	Xicon	naO	Quest	naO	naO	naO	naO	Rectifier Diodes	Axial	Euler 229 Teaching Lab	A16A	100	271-2K-RC	naO	naO	
+25 *==>naO	271-47-RC	271-47-RC	naO	271-47-RC	Xicon	naO	naO	naO	naO	naO	naO	Rectifier Diodes	Axial	Euler 229 Teaching Lab	A16A	100	271-47-RC	naO	naO	
+26 *==>naO	271-49.9K-RC	271-49.9K-RC	naO	naO	naO	naO	naO	naO	naO	naO	naO	Rectifier Diodes	naO	Euler 229 Teaching Lab	A16A	25	271-49.9K-RC	naO	naO	
+27 *==>naO	291-5.1-RC	291-5.1-RC	naO	291-51-RC	Xicon	naO	Quest	naO	naO	naO	naO	Rectifier Diodes	Through Hole	Euler 229 Teaching Lab	A16A	100	291-5.1-RC	naO	naO	
+28 *==>naO	291-560-RC	291-560-RC	naO	naO	naO	naO	naO	naO	naO	naO	naO	Rectifier Diodes	naO	Euler 229 Teaching Lab	A16A	25	291-560-RC	naO	naO	
+29 *==>naO	2N3904TAR	2N3904TAR	Trans GP BJT NPN 40V 0.2A 3-Pin TO-92 Ammo	2N3904TAR	Fairchild Semiconductor	naO	South Electronics	naO	naO	naO	naO	Rectifier Diodes	Through Hole	Euler 229 Teaching Lab	A16D	50	2N3904TAR	naO	naO	
+30 *==>naO	2N7000TA	2N7000TA	2N7000BU Series 60 V 5 Ohm N-Channel Advanced Small Signal MOSFET - TO-92	2N7000TA	ON Semiconductor	naO	Quest	naO	naO	naO	naO	Rectifier Diodes	Through Hole	Euler 229 Teaching Lab	A16D	50	2N7000TA	naO	naO	
+31 *==>naO	551-0207F	551-0207F	551 Series Green 3mm 45° 16 mcd Diffused 10 mA 2.1 V LED Circuit Board Indicator	551-0207F	Dialight	naO	Select Technology	naO	naO	naO	naO	Rectifier Diodes	Through Hole, PCB	Euler 229 Teaching Lab	A16C	25	551-0207F	naO	naO	
+32 *==>naO	551-0407F	551-0407F	Indicator, Circuit Board, Led, 3mm, High Efficiency, .200 High Centerline, Red	551-0407F	Dialight	naO	Select Technology	naO	naO	naO	naO	Rectifier Diodes	Through Hole, PCB	Euler 229 Teaching Lab	A16C	15	551-0407F	naO	naO	
+33 *==>naO	AI-155	AI-155	PCB BUZZER 5V SUBMIN; Resonant Frequency: 2.3kHz; Sound Level SPL: 85dB; SVHC: No SVHC (20-Jun-2011); Current Consump...	AI-155	Projects Unlimited	naO	Quest	naO	naO	naO	naO	Rectifier Diodes	Through Hole	Euler 229 Teaching Lab	A16C	6	AI-155	naO	naO	
+34 *==>naO	BAT-HLD-001	BAT-HLD-001	CR2032 Phosphor Bronze / Nickel Plated 20 mm Cell Size Battery Holder	BAT-HLD-001	Linx	naO	NAC Semi	naO	naO	naO	naO	Rectifier Diodes	Surface Mount	Euler 229 Teaching Lab	A16D	2	BAT-HLD-001	naO	naO	
+*======== HTTP request category responseCode: 429 Category: c85a0550f9be139d
+35 *==>naO	BCAP0050 P270 T01	BCAP0050 P270 T01	BCAP 50F 2, 7V 20% 18x40/7, 5	BCAP0050P270T01	Maxwell Technologies	naO	iodParts	naO	naO	naO	naO	Rectifier Diodes	Radial	Euler 229 Teaching Lab	A16B	50	BCAP0050 P270 T01	naO	naO	
+*________ HTTP request part responseCode: 429 Hit rate limit!
+*======== HTTP request category responseCode: 429 Category: c85a0550f9be139d
+36 *==>naO	BZX85B5V1-TR	BZX85B5V1-TR	naO	naO	naO	naO	naO	naO	naO	naO	naO	Rectifier Diodes	naO	Euler 229 Teaching Lab	A16D	25	BZX85B5V1-TR	naO	naO	
+*________ HTTP request part responseCode: 429 Hit rate limit!
+*======== HTTP request category responseCode: 429 Category: c85a0550f9be139d
+37 *==>naO	CMB-6544PF	CMB-6544PF	naO	naO	naO	naO	naO	naO	naO	naO	naO	Rectifier Diodes	naO	Euler 229 Teaching Lab	A16C	15	CMB-6544PF	naO	naO	
+*________ HTTP request part responseCode: 429 Hit rate limit!
+*======== HTTP request category responseCode: 429 Category: c85a0550f9be139d
+38 *==>naO	CR2032 Battery	CR2032 Battery	naO	naO	naO	naO	naO	naO	naO	naO	naO	Rectifier Diodes	naO	Euler 229 Teaching Lab	A16C	2	CR2032 Battery	naO	naO	
+*________ HTTP request part responseCode: 429 Hit rate limit!
+39 *==>naO	D103M29Z5UH6UJ5R	D103M29Z5UH6UJ5R	naO	naO	naO	naO	naO	naO	naO	naO	naO	Rectifier Diodes	naO	Euler 229 Teaching Lab	A16B	50	D103M29Z5UH6UJ5R	naO	naO	
+40 *==>naO	ECA-1HM100I	ECA-1HM100I	Cap Aluminum 10uF 50V 20% (5 X 11mm) Radial Aluminum Cylindrical Can 2.5mm 65mA 2000 hr 85°C Ammo Pack	ECA-1HM100I	Panasonic	naO	Select Technology	naO	naO	naO	naO	Rectifier Diodes	Through Hole	Euler 229 Teaching Lab	A16B	50	ECA-1HM100I	naO	naO	
+41 *==>naO	ERJ-6ENF1002V	ERJ-6ENF1002V	Precision resistor, SMD [Panasonic Automotive & Industrial Systems] ERJ6ENF1002V Precision resistor, SMD	ERJ-6ENF1002V	Panasonic	naO	Area51	naO	naO	naO	naO	Rectifier Diodes	Surface Mount	Euler 229 Teaching Lab	A16A	100	ERJ-6ENF1002V	naO	naO	
+42 *==>naO	ERJ-6ENF1004V	ERJ-6ENF1004V	Res Thick Film 0805 1M Ohm 1% 0.125W(1/8W) ???}100ppm/??? Molded SMD Automotive Punched T/R	ERJ-6ENF1004V	Panasonic	naO	ChipNet	naO	naO	naO	naO	Rectifier Diodes	Surface Mount	Euler 229 Teaching Lab	A16A	100	ERJ-6ENF1004V	naO	naO	
+43 *==>naO	ESH105M050AC3AA	ESH105M050AC3AA	Cap Aluminum 1uF 50V 20% (5 X 11mm) Radial Aluminum Cylindrical Can 2mm 12mA 2000 hr 105°C Bulk	ESH105M050AC3AA	KEMET	naO	Avnet Europe	naO	naO	naO	naO	Rectifier Diodes	PCB	Euler 229 Teaching Lab	A16B	50	ESH105M050AC3AA	naO	naO	
+44 *==>naO	ESH225M050AC3AA	ESH225M050AC3AA	Cap Aluminum 2.2uF 50V 20% (5 X 11mm) Radial Aluminum Cylindrical Can 2mm 18mA 2000 hr 105°C Bulk	ESH225M050AC3AA	KEMET	naO	Avnet Europe	naO	naO	naO	naO	Rectifier Diodes	PCB	Euler 229 Teaching Lab	A16B	50	ESH225M050AC3AA	naO	naO	
+45 *==>naO	FK24X7R1H105K	FK24X7R1H105K	FK24 Series 5.5 x 4.5 mm 1 uF 50 V ±10 % Tolerance X7R Radial Ceramic Capacitor	FK24X7R1H105K	TDK	naO	NAC Semi	naO	naO	naO	naO	Rectifier Diodes	Through Hole	Euler 229 Teaching Lab	A16B	50	FK24X7R1H105K	naO	naO	
+46 *==>naO	H102K25X7RL63J5R	H102K25X7RL63J5R	Ceramic Capacitors .2LS 1000PF 500V 10%	H102K25X7RL63J5R	Vishay	naO	Mouser	naO	naO	naO	naO	Rectifier Diodes	Radial	Euler 229 Teaching Lab	A16B	50	H102K25X7RL63J5R	naO	naO	
+47 *==>naO	K102K15X7RF5TL2	K102K15X7RF5TL2	Capacitor; Ceramic; Cap 1000 pF; Tol 10%; Vol-Rtg 50 VDC; Radial; X7R; Tape & Reel	K102K15X7RF5TL2	Vishay BCcomponents	naO	Avnet Europe	naO	naO	naO	naO	Rectifier Diodes	Radial	Euler 229 Teaching Lab	A16B	50	K102K15X7RF5TL2	naO	naO	
+48 *==>naO	K104K15X7RF53H5	K104K15X7RF53H5	K 100nF Ceramic Multilayer Capacitor, 50 V dc, +125degC, X7R Dielectric, +/-10%	K104K15X7RF53H5	Vishay	naO	Quest	naO	naO	naO	naO	Rectifier Diodes	Radial	Euler 229 Teaching Lab	A16B	50	K104K15X7RF53H5	naO	naO	
+49 *==>naO	LF-5WAEMBGMBC	LF-5WAEMBGMBC	LED Quad-Color 2Blue/Green/Red 430nm/565nm/627nm 2-Pin T-1 3/4	LF-5WAEMBGMBC	Kingbright	naO	Avnet Europe	naO	naO	naO	naO	Rectifier Diodes	Through Hole	Euler 229 Teaching Lab	A16C	20	LF-5WAEMBGMBC	naO	naO	
+50 *==>naO	LM358AP	LM358AP	OP Amp Dual General Purpose ±16 Volt/32 Volt 8-Pin PDIP	LM358AP	Texas Instruments	naO	Select Technology	naO	naO	naO	naO	Rectifier Diodes	Through Hole	Euler 229 Teaching Lab	A16D	20	LM358AP	naO	naO	
+51 *==>naO	LM4040D25ILPR	LM4040D25ILPR	Precision Micropower Shunt Voltage Reference 3-TO-92 -40 to 85	LM4040D25ILPR	Texas Instruments	naO	Avnet	naO	naO	naO	naO	Rectifier Diodes	Through Hole	Euler 229 Teaching Lab	A16D	1	LM4040D25ILPR	naO	naO	
+52 *==>naO	LM78L05ACZX	LM78L05ACZX	Low Drop Out (LDO) Regulator Position 5 Volt 0.1A 3-Pin TO-92R	LM78L05ACZX	Fairchild Semiconductor	naO	Abacus Technologies	naO	naO	naO	naO	Rectifier Diodes	Through Hole	Euler 229 Teaching Lab	A16D	10	LM78L05ACZX	naO	naO	
+53 *==>naO	LTL2R3KRD-EM	LTL2R3KRD-EM	LED; 5mm; red; 50mcd; 30°; Front: convex; Pitch: 2.54mm	LTL2R3KRD-EM	Lite-On	naO	TME	naO	naO	naO	naO	Rectifier Diodes	Through Hole	Euler 229 Teaching Lab	A16C	50	LTL2R3KRD-EM	naO	naO	
+*======== HTTP request category responseCode: 429 Category: c85a0550f9be139d
+54 *==>naO	LTL2R3KYD-EM	LTL2R3KYD-EM	LED Uni-Color Amber Yellow 592nm 2-Pin Bag	LTL2R3KYD-EM	Lite-On	naO	Rutronik	naO	naO	naO	naO	Rectifier Diodes	Through Hole	Euler 229 Teaching Lab	A16C	15	LTL2R3KYD-EM	naO	naO	
+*________ HTTP request part responseCode: 429 Hit rate limit!
+*======== HTTP request category responseCode: 429 Category: c85a0550f9be139d
+55 *==>naO	MF1/4DC1R00F	MF1/4DC1R00F	naO	naO	naO	naO	naO	naO	naO	naO	naO	Rectifier Diodes	naO	Euler 229 Teaching Lab	A16A	50	MF1/4DC1R00F	naO	naO	
+*________ HTTP request part responseCode: 429 Hit rate limit!
+*======== HTTP request category responseCode: 429 Category: c85a0550f9be139d
+56 *==>naO	MFR-25FBF52-10R	603-MFR-25FBF52-10R	naO	naO	naO	naO	naO	naO	naO	naO	naO	Rectifier Diodes	naO	Euler 229 Teaching Lab	A16A	100	MFR-25FBF52-10R	naO	naO	
+*________ HTTP request part responseCode: 429 Hit rate limit!
+57 *==>naO	MFR-25FRF52-20K	MFR-25FRF52-20K	naO	naO	naO	naO	naO	naO	naO	naO	naO	Rectifier Diodes	naO	Euler 229 Teaching Lab	A16A	50	MFR-25FRF52-20K	naO	naO	
+58 *==>naO	MJE3055TTU	MJE3055TTU	Trans GP BJT NPN 60V 10A 3-Pin(3+Tab) TO-220 Rail	MJE3055TTU	Fairchild Semiconductor	naO	Freedom EMG	naO	naO	naO	naO	Rectifier Diodes	Through Hole	Euler 229 Teaching Lab	A16D	5	MJE3055TTU	naO	naO	
+59 *==>naO	PJ-102AH	PJ-102AH	2.0 mm Center Pin, 5.0 A, Right Angle, Through Hole, Tapered Pins, Dc Power Jack Connector	PJ-102AH	CUI	naO	NAC Semi	naO	naO	naO	naO	Rectifier Diodes	Through Hole	Euler 229 Teaching Lab	A16D	10	PJ-102AH	naO	naO	
+60 *==>naO	RDE5C2A101J0M1H03A	RDE5C2A101J0M1H03A	Cap Ceramic 100pF 100V C0G 5% Radial 5mm 125°C Ammo Pack	RDE5C2A101J0M1H03A	Murata	naO	Avnet Europe	naO	naO	naO	naO	Rectifier Diodes	Through Hole	Euler 229 Teaching Lab	A16B	20	RDE5C2A101J0M1H03A	naO	naO	
+61 *==>naO	REA010M2CBK-0511P	REA010M2CBK-0511P	naO	REA010M2CBK-0511P	Lelon	naO	Mouser	naO	naO	naO	naO	Rectifier Diodes	Radial	Euler 229 Teaching Lab	A16B	20	REA010M2CBK-0511P	naO	naO	
+62 *==>naO	REA101M1EBK-0611P	REA101M1EBK-0611P	naO	REA101M1EBK-0611P	Lelon	naO	Mouser	naO	naO	naO	naO	Rectifier Diodes	Radial	Euler 229 Teaching Lab	A16B	15	REA101M1EBK-0611P	naO	naO	
+63 *==>naO	REA101M1HBK-0811P	REA101M1HBK-0811P	naO	REA101M1HBK-0811P	Lelon	naO	Mouser	naO	naO	naO	naO	Rectifier Diodes	Radial	Euler 229 Teaching Lab	A16B	25	REA101M1HBK-0811P	naO	naO	
+64 *==>naO	RGA4R7M1HBK-0511G	RGA4R7M1HBK-0511G	naO	RGA4R7M1HBK-0511G	Lelon	naO	Mouser	naO	naO	naO	naO	Rectifier Diodes	Radial	Euler 229 Teaching Lab	A16B	25	RGA4R7M1HBK-0511G	naO	naO	
+65 *==>naO	SLX-LX5093GD	SLX-LX5093GD	T5mm XTRA VALUE LED, 565 GREEN, DIFF LENS	SLX-LX5093GD	Lumex	naO	Electro Sonic	naO	naO	naO	naO	Rectifier Diodes	Through Hole	Euler 229 Teaching Lab	A16C	15	SLX-LX5093GD	naO	naO	
+66 *==>naO	SN74HC00N	SN74HC00N	NAND Gate 4-Element 2-IN CMOS 14-Pin PDIP NAND Gate 4-Element 2-IN CMOS 14-Pin PDIP NAND Gate 4-Element 2-IN CMOS 14-...	SN74HC00N	Texas Instruments	naO	Distrelec	naO	naO	naO	naO	Rectifier Diodes	Through Hole	Euler 229 Teaching Lab	A16C	10	SN74HC00N	naO	naO	
+67 *==>naO	SN74HC02N	SN74HC02N	IC: digital; Channels: 4; NOR; Inputs: 2; THT; DIP14; Ser	SN74HC02N	Texas Instruments	naO	Distrelec	naO	naO	naO	naO	Rectifier Diodes	Through Hole	Euler 229 Teaching Lab	A16C	10	SN74HC02N	naO	naO	
+68 *==>naO	SN74HC244N	SN74HC244N	Buffer/Line Driver 8-Channel Non-Inverting 3-Straight CMOS 20-Pin PDIP	SN74HC244N	Texas Instruments	naO	Distrelec	naO	naO	naO	naO	Rectifier Diodes	Through Hole	Euler 229 Teaching Lab	A16C	10	SN74HC244N	naO	naO	
+69 *==>naO	SPX1117M3-L-3-3/TR	SPX1117M3-L-3-3/TR	SPX1117 Series 3.3 V Fixed Output 800 mA SMT LDO Regulator - SOT-223-3 T/R	SPX1117M3-L-3-3/TR	Exar	naO	Abacus Technologies	naO	naO	naO	naO	Rectifier Diodes	Surface Mount	Euler 229 Teaching Lab	A16D	10	SPX1117M3-L-3-3/TR	naO	naO	
+70 *==>naO	SSL-LX5093USBD	SSL-LX5093USBD	LED; Blue; 300 mcd (Typ.) @ 25 degC (Axial); T-5; 3.5 V (Typ.) @ 25 degC (Forw	SSL-LX5093USBD	Lumex	naO	Quest	naO	naO	naO	naO	Rectifier Diodes	Through Hole	Euler 229 Teaching Lab	A16C	25	SSL-LX5093USBD	naO	naO	
+71 *==>naO	T73XW203KT20	T73XW203KT20	Res Cermet Trimmer 20K Ohm 10% 1/2W 1(Elec)/1(Mech)Turn (6.6 X 4.7 X 7mm) Pin Thru-Hole Tube	T73XW203KT20	Vishay Dale	naO	Avnet	naO	naO	naO	naO	Rectifier Diodes	Through Hole	Euler 229 Teaching Lab	A16A	10	T73XW203KT20	naO	naO	
+*======== HTTP request category responseCode: 429 Category: c85a0550f9be139d
+72 *==>naO	TL1105FF100Q	TL1105FF100Q	TL1105 Series SPST 1 N Round Button PC Through Hole Tactile Switch	TL1105FF100Q	E-Switch	naO	Electro Sonic	naO	naO	naO	naO	Rectifier Diodes	PCB	Euler 229 Teaching Lab	A16D	50	TL1105FF100Q	naO	naO	
+*________ HTTP request part responseCode: 429 Hit rate limit!
+*======== HTTP request category responseCode: 429 Category: c85a0550f9be139d
+73 *==>naO	TL431CZ-AP	TL431CZ-AP	naO	naO	naO	naO	naO	naO	naO	naO	naO	Rectifier Diodes	naO	Euler 229 Teaching Lab	A16D	10	TL431CZ-AP	naO	naO	
+*________ HTTP request part responseCode: 429 Hit rate limit!
+74 *==>naO	UPW1A222MHD	UPW1A222MHD	naO	naO	naO	naO	naO	naO	naO	naO	naO	Rectifier Diodes	naO	Euler 229 Teaching Lab	A16B	naI	UPW1A222MHD	naO	naO	
+75 *==>naO	USF1V150MDD	USF1V150MDD	Cap Aluminum 15uF 35V 20% (6.3 X 7mm) Radial 2.5mm 160mA 1000 hr 105°C Bulk	USF1V150MDD	Nichicon	naO	Avnet Europe	naO	naO	naO	naO	Rectifier Diodes	naO	Euler 229 Teaching Lab	A16B	20	USF1V150MDD	naO	naO	
+76 *==>naO	UVR1E471MPD	UVR1E471MPD	Capacitor Aluminum Electrolytic 470uF 25 Volt 20% (10 X 12.5mm) Radial 5mm 550mA 2000h 85C Bulk	UVR1E471MPD	Nichicon	naO	LTL Group	naO	naO	naO	naO	Rectifier Diodes	Through Hole	Euler 229 Teaching Lab	A16B	10	UVR1E471MPD	naO	naO	
+77 *==>naO	UVR1HR22MDD	UVR1HR22MDD	VR Series 50 V 0.22 uF 5 x 11 mm 2 mm=LS Radial Aluminum Electrolytic Capacitor	UVR1HR22MDD	Nichicon	naO	Avnet Europe	naO	naO	naO	naO	Rectifier Diodes	Through Hole	Euler 229 Teaching Lab	A16B	2	UVR1HR22MDD	naO	naO	
+
+*********************************** end program OctopartGet.pl  program.***********************************

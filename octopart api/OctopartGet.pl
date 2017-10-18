@@ -261,7 +261,7 @@ foreach (@mpn)
     %GSvalues = (); # Init for next spreadsheet row
     print "\nRequest information on: $_\n" if $verbose;
     getPart($_); # Get the information
-    sleep(0.5); # Avoid Octopart rate limit (in msec)
+#    sleep(0.5); # Avoid Octopart rate limit (in msec)
 }
 print "\n*********************************** end program $0  program.***********************************\n";
 
@@ -270,6 +270,7 @@ print "\n*********************************** end program $0  program.***********
 sub getPart
 {
     my $part = shift;   # Get part name
+    sleep(0.95); # Avoid Octopart rate limit (in msec)
     $octopart->GET('/api/v3/parts/match'
                     . '?' . 'apikey=4ed77e1e'
                     . '&' . "queries=[{\"mpn\":\"$part\"}]"
@@ -283,12 +284,17 @@ sub getPart
                     . '&' . 'pretty_print=true'
                     );
     my $rc = $octopart->responseCode(); # Get response code
-    print "\nHTTP request part responseCode: ", $rc, "\n"; # if $verbose;
-    if($rc == 429) # Hit rate limit of 3 requests per second
+    unless ($rc == 200)
     {
-        print "Hit rate limit! \n";
-        sleep(1);
+        print "*________ HTTP request part responseCode: ", $rc; # if $verbose;
+        if($rc == 429) # Hit rate limit of 3 requests per second
+        {
+            print " Hit rate limit!";
+            sleep(1);
+        }
+        print "\n";
     }
+    
 
     my $json = JSON->new->allow_nonref;
     my $jsonDecode = $json->decode($octopart->responseContent());
@@ -302,6 +308,10 @@ sub getPart
 #        msec	     The server response 
 #                    time in milliseconds	  234	                         n/a
 
+#    unless ($PartsMatchResponse->{"msec"})
+#    {
+#        sleep(.5); # If "msec" is NULL we hit rate limit
+#    }
     printResult("millisec: ", $PartsMatchResponse->{"msec"}) if $verbose;
     printResult("CLASS: ", $PartsMatchResponse->{"__class__"}) if $verbose;
 
@@ -355,7 +365,7 @@ sub getPart
     my (%hashput, @unique);
     unless(@Categories)
     {
-        %hashput;
+#        %hashput;
         @hashput{@Categories} = (); # use hash keys to get rid of dups
         @unique = sort keys %hashput; # unique sorted specs
         print "\nNumber of Sorted Categories: ", scalar @unique, "\n" if $verbose;
@@ -422,6 +432,8 @@ sub getPart
     
     my @partRow = @{$partLoc{$part}};
     $GSvalues{'Search'} = $part;
+    $GSvalues{'*Item Searched'} = $part;
+    $GSvalues{'Item'} =  $partRow[$headerNameIndex{'Item'}];
     $GSvalues{'Location'} =  $partRow[$headerNameIndex{'Location'}];
     $GSvalues{'Location 2'} =  $partRow[$headerNameIndex{'Location 2'}];
     $GSvalues{'Quantity'} =  $partRow[$headerNameIndex{'Quantity'}];
@@ -444,15 +456,16 @@ sub getPart
 sub getCategory
 {
     my ($json, $c) = @_;
+    sleep(0.95);
     $octopart->GET("/api/v3/categories/$c"
                     . '?' . 'apikey=4ed77e1e');
-    sleep(.5);
+    
 #    $octopart->GET('/api/v3/categories/get_multi'
 #                    . '?' . 'apikey=4ed77e1e'
 #                    . '&' . "queries=[{\"$c\"}]"
 #                    );
-    unless ($octopart->responseCode() ==200){
-        print "HTTP request category responseCode: ", $octopart->responseCode(), " Category: ", $c, "\n";
+    unless ($octopart->responseCode() == 200){
+        print "*======== HTTP request category responseCode: ", $octopart->responseCode(), " Category: ", $c, "\n";
     }
 
         my $Category = $json->decode($octopart->responseContent());

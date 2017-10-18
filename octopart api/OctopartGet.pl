@@ -23,6 +23,19 @@ binmode STDOUT, ":utf8"; # get rid of warnings about special characters
 # 429 - Hit rate limit!
 # 500 Can't connect to Octopart - internet down?
 
+#    HTTP Status	Likely cause
+#    200            OK	Your request was completed successfully
+#    400            Bad Request	Your request is missing an 'apikey' argument
+#    403            Forbidden	Your apikey is invalid
+#    404            Not Found	The resource you are accessing doesn't exist
+#    429            Too Many Requests	You have been blocked by the rate limiter
+#    500            Internal Server Error	Something went wrong server-side and we've 
+#                   been notified about the problem. In many cases, there was a problem 
+#                   with your request which wasn't handled properly by the server.
+#    502            Bad Gateway	Our app servers have crashed. This error happens extremely rarely. 
+#                   If you encounter it repeatedly please notify us ASAP.
+#    503            Service Unavailable	The service is down for maintenance and will be restored ASAP
+
 
 use REST::Client;
 use JSON;
@@ -195,7 +208,7 @@ foreach (@lines)
 my @mpn = qw( 1N5235BTR 1N5251B 1N5819 512-1N5231B 1N5231B);
 
 @mpn = @partsOrder;
-print "\n____Parts\n";
+print "\n____Parts found: ", scalar @mpn ,"\n";
 map { print "$_ "} @mpn;
 print "\n____End Parts\n";
 
@@ -301,12 +314,12 @@ sub getPart
 
     my $PartsMatchResponse = $jsonDecode; # top level information
 
-#        PartsMatchResponse schema:
-#        Property	 Description	         Example	                    Empty Value
-#        request	 The original request	 <PartsMatchRequest object>	    n/a
-#        results	 List of query results	 [<PartsMatchResult object>]	n/a
-#        msec	     The server response 
-#                    time in milliseconds	  234	                         n/a
+#SCHEMA        PartsMatchResponse schema:
+#SCHEMA        Property	 Description	         Example	                    Empty Value
+#SCHEMA        request	 The original request	 <PartsMatchRequest object>	    n/a
+#SCHEMA        results	 List of query results	 [<PartsMatchResult object>]	n/a
+#SCHEMA        msec	     The server response 
+#SCHEMA                  time in milliseconds	 234	                        n/a
 
 #    unless ($PartsMatchResponse->{"msec"})
 #    {
@@ -318,12 +331,56 @@ sub getPart
     my $PartsMatchRequest = $PartsMatchResponse->{"request"};
     printResult("Request: ", $PartsMatchRequest->{"__class__"}) if $verbose;
 
+
+#SCHEMA        PartsMatchRequest schema:
+#SCHEMA        Property	    Description	                     Example	                    Empty Value
+#SCHEMA        queries	    List of queries	                 [<PartsMatchQuery object>]	[]
+#SCHEMA        exact_only	Match on non-alphanumeric 
+#SCHEMA                     characters in part numbers	     true	                        false
+
     my $PartsMatchQuery = $PartsMatchRequest->{"queries"};
+    
+#SCHEMA        PartsMatchQuery schema:
+#SCHEMA        Property	    Description	                    Example	                Empty Value
+#SCHEMA        q	        Free-form keyword query	        "TI SN74S74N"	        ""
+#SCHEMA        mpn	        MPN search filter (See notes: 
+#SCHEMA                     Part Number Filters)	        "SN74S74N"	            null
+#SCHEMA        brand	    Brand search filter	            "Texas Instruments"	    null
+#SCHEMA        sku	        SKU search filter (See notes: 
+#SCHEMA                     Part Number Filters)	        "67K1122"	            null
+#SCHEMA        seller	    Seller search filter	        "Newark"	            null
+#SCHEMA        mpn_or_sku	MPN or SKU search filter (See 
+#SCHEMA                     notes: Part Number Filters)	    "SN74S74N"	            null
+#SCHEMA        start	    Ordinal position of first 
+#SCHEMA                     returned item	                0	                    0
+#SCHEMA        limit	    Maximum number of items 
+#SCHEMA                     to return	                    20	                    3
+#SCHEMA        reference	Arbitrary string for 
+#SCHEMA                     identifying results	            "line1"	                null
+    
     printResult("Request for mpn: ", $PartsMatchQuery->[0]->{"mpn"}) if $verbose;
     printResult("Request for seller: ", $PartsMatchQuery->[0]->{"seller"}) if $verbose;
     printResult("Request for brand: ", $PartsMatchQuery->[0]->{"brand"}) if $verbose;
 
+#SCHEMA        PartsMatchResponse schema:
+#SCHEMA        Property	     Description	            Example	                       Empty Value
+#SCHEMA        request	     The original request	   <PartsMatchRequest object>	   n/a
+#SCHEMA        results	     List of query results	   [<PartsMatchResult object>]	   n/a
+#SCHEMA        msec	         The server response 
+#SCHEMA                      time in milliseconds	   234	                           n/a
+
     my $PartsMatchResult = $PartsMatchResponse->{"results"};
+    
+#SCHEMA        PartsMatchResult schema:
+#SCHEMA        Property	    Description	                Example	                    Empty Value
+#SCHEMA        items	    List of matched parts	    [<Part object>]	            []
+#SCHEMA        hits	        Total number of matched 
+#SCHEMA                     items	                    2	                        null
+#SCHEMA        reference	Reference string specified 
+#SCHEMA                     in query	                "line1"	                    null
+#SCHEMA        error	    Error message 
+#SCHEMA                     (if applicable)	            "Missing search filters"	null
+    
     printResult("Results: ", $PartsMatchResult->[0]->{"__class__"}) if $verbose;
     printResult("Results hits: ", $PartsMatchResult->[0]->{"hits"}) if $verbose;
     printResult("Results error: ", $PartsMatchResult->[0]->{"error"}) if $verbose;
@@ -485,20 +542,71 @@ sub getItems
     
     my $Part = shift;
     $_ = shift; # grab array index
+    
+#SCHEMA        Part schema:
+
+#SCHEMA        Property	            Description	                                Example	                         Empty Value
+#SCHEMA        uid	                64-bit unique identifier	                "e7392c64ca2538fe"	             n/a
+#SCHEMA        mpn	                The manufacturer part number	            "SN74S74N"	                     n/a
+#SCHEMA        manufacturer	        Object representing the manufacturer	    <Manufacturer object>	         n/a
+#SCHEMA        brand	            Object representing the brand	            <Brand object>	n/a
+#SCHEMA        octopart_url	        The url of the Octopart part detail page	"http://octopart.com/XXXX"	     n/a
+#SCHEMA        external_links	    Hidden by default (See Include Directives)	<ExternalLinks object>	         n/a
+
+#SCHEMA        Pricing and Availability
+#SCHEMA        offers	            List of offer objects	                    [<PartOffer object>]	         []
+#SCHEMA        broker_listings	    Hidden by default (See Include Directives)	<BrokerListing object>	         []
+
+#SCHEMA        Descriptions and Images
+#SCHEMA        short_description	Hidden by default (See Include Directives)	"CAP THIN FILM 0.3PF 16V 01005"	 null
+#SCHEMA        descriptions	        Hidden by default (See Include Directives)	[<Description object>]	         []
+#SCHEMA        imagesets	        Hidden by default (See Include Directives)	[<ImageSet object>]	             []
+
+#SCHEMA        Documents and Files
+#SCHEMA        datasheets	        Hidden by default (See Include Directives)	[<Datasheet object>]	         []
+#SCHEMA        compliance_documents	Hidden by default (See Include Directives)	[<ComplianceDocument object>]	 []
+#SCHEMA        reference_designs	Hidden by default (See Include Directives)	[<ReferenceDesign object>]	     []
+#SCHEMA        cad_models	        Hidden by default (See Include Directives)	[<CADModel object>]	             []
+
+#SCHEMA        Technical Specs
+#SCHEMA        specs	            Hidden by default (See Include Directives)	See notes: Part.specs	         {}
+#SCHEMA        category_uids	    Hidden by default (See Include Directives)	["8ffd42f7bed8543a", 
+#SCHEMA                                                                          "7a48b7424b6aa18f"]	         []
+    
     printResult("items $_ class: ", $Part->[$_]->{'__class__'}) if $verbose;
     printResult("items $_ mpn: ", $Part->[$_]->{'mpn'}) if $verbose;
     printResult("items $_ short desc: ", $Part->[$_]->{'short_description'}) if $verbose;
     push @Short_Descriptions, $Part->[$_]->{'short_description'};
     
     printResult("items $_ octopart url: ", $Part->[$_]->{'octopart_url'}) if $verbose;
+    
+#SCHEMA        Brand schema:
+#SCHEMA        Property	        Description	                Example	                Empty Value
+#SCHEMA        uid	            64-bit unique identifier	"3c8cfd861098eb4b"	    n/a
+#SCHEMA        name	            The brand's display name	"Texas Instruments"	    n/a
+#SCHEMA        homepage_url	    The brand's homepage url	"http://example.com"	null
+    
     # Brand Object - brand
     my $Brand = $Part->[$_]->{'brand'};
     printResult("Brand Name: ", $Brand->{'name'}) if $verbose;
     printResult("Brand url: ", $Brand->{'homepage_url'}) if $verbose;
     printResult("Brand uid: ", $Brand->{'uid'}) if $verbose;
+    
+#SCHEMA        Manufacturer schema:
+#SCHEMA        Property	     Description	                    Example	                    Empty Value
+#SCHEMA        uid	         64-bit unique identifier	        "a6e363e98ef77524"	        n/a
+#SCHEMA        name	         The manufacturer's display name    "Texas Instruments Inc."	n/a
+#SCHEMA        homepage_url	 The manufacturer's homepage url	"http://example.com"	    null    
+    
     # Manufacturer Object - manufacturer
     my $Manufacturer = $Part->[$_]->{'manufacturer'};
     printResult("Mfg display name: ", $Manufacturer->{'name'}) if $verbose;
+    
+#SCHEMA        Description schema:
+#SCHEMA        Property	    Description	                        Example	                            Empty Value
+#SCHEMA        value	    The value of the description	    "The TLC274AID is a precision ..."	n/a
+#SCHEMA        attribution	Information about the data source	<Attribution object>	            n/a    
+    
     # Description Object - descriptions
     my $Description = $Part->[$_]->{'descriptions'};
     
@@ -516,6 +624,19 @@ sub getItems
                     );
     } # unless ($_)
     
+    
+#SCHEMA        SpecValue schema:
+#SCHEMA        Property	       Description	                           Example	                Empty Value
+#SCHEMA        value	       The value of the product property	   ["5.0"]	                []
+#SCHEMA        min_value	   The minimum value (if ranged 
+#SCHEMA                        quantitative value)	                   "2.2"	                null
+#SCHEMA        max_value	   The maximum value (if ranged 
+#SCHEMA                        quantitative value)	                   "10.8"	                null
+#SCHEMA        display_value   Value and unit as a string, 
+#SCHEMA                        formatted for humans	                   "170 mV"	                ""
+#SCHEMA        metadata	       Spec metadata information	           <SpecMetadata object>	n/a
+#SCHEMA        attribution	   Information about the data source	   <Attribution object>	    n/a    
+    
     my $Partspecs = $Part->[$_]->{'specs'};
     while ( my ($key, $val) = each (%$Partspecs))
     {
@@ -528,6 +649,8 @@ sub getItems
             $GSvalues{'Type'} = $val->{'display_value'}; # TH or SMT
         }
     }
+    
+    
     
     my $Categories = $Part->[$_]->{'category_uids'};
     foreach my $c (@$Categories)

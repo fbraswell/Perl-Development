@@ -2,6 +2,11 @@
 use strict;
 use warnings;
 
+# This program imports tab delimited data  in file 'inputdata.txt' 
+# which includes manufacturers part numbers.
+# It looks up the part information on Octopart and populates the information for each part
+# in a tab delimited output file.
+
 # Confused between versions of Perl
 # Installed JSON module for Perl but cannot load it, Can't locate JSON.pm in @INC
 # https://stackoverflow.com/questions/41143638/installed-json-module-for-perl-but-cannot-load-it-cant-locate-json-pm-in-inc
@@ -48,87 +53,6 @@ print "command line input: $pnum\n" if $pnum;
 
 my $verbose = 0; # default 0 - Print everything = 1
 
-# Location,Location 2,Quantity,Item
-
-my $inStr = 
-"Euler 229 Teaching Lab,,20,1N5235BTR
-Euler 229 Teaching Lab,,10,1N5251B
-Euler 229 Teaching Lab,,25,1N5819
-Euler 229 Teaching Lab,,25,512-1N5231B
-Euler 229 Teaching Lab,,50,833-1N4148W-TP
-Euler 229 Teaching Lab,,25,BZX85B5V1-TR
-Euler 229 Teaching Lab,,50,100F5T-YT-SRY-WH
-Euler 229 Teaching Lab,,50,100F5T-YT-WH-WH
-Euler 229 Teaching Lab,,25,551-0207F
-Euler 229 Teaching Lab,,15,551-0407F
-Euler 229 Teaching Lab,,20,LF-5WAEMBGMBC
-Euler 229 Teaching Lab,,50,LTL2R3KRD-EM
-Euler 229 Teaching Lab,,15,LTL2R3KYD-EM
-Euler 229 Teaching Lab,,15,SLX-LX5093GD
-Euler 229 Teaching Lab,,25,SSL-LX5093USBD
-Euler 229 Teaching Lab,,3,10A2-B
-Euler 229 Teaching Lab,,50,1N4001-TP
-Euler 229 Teaching Lab,,50,1N4004-T
-Euler 229 Teaching Lab,,10,SN74HC00N
-Euler 229 Teaching Lab,,10,SN74HC02N
-Euler 229 Teaching Lab,,10,SN74HC244N
-Euler 229 Teaching Lab,,20,LM358AP
-Euler 229 Teaching Lab,,15,CMB-6544PF
-Euler 229 Teaching Lab,,2,BAT-HLD-001
-Euler 229 Teaching Lab,,2,CR2032 Battery
-Euler 229 Teaching Lab,,50,BCAP0050 P270 T01
-Euler 229 Teaching Lab,,50,D103M29Z5UH6UJ5R
-Euler 229 Teaching Lab,,50,ECA-1HM100I
-Euler 229 Teaching Lab,,50,ESH105M050AC3AA
-Euler 229 Teaching Lab,,50,ESH225M050AC3AA
-Euler 229 Teaching Lab,,50,FK24X7R1H105K
-Euler 229 Teaching Lab,,50,H102K25X7RL63J5R
-Euler 229 Teaching Lab,,50,K102K15X7RF5TL2
-Euler 229 Teaching Lab,,50,K104K15X7RF53H5
-Euler 229 Teaching Lab,,20,RDE5C2A101J0M1H03A
-Euler 229 Teaching Lab,,20,REA010M2CBK-0511P
-Euler 229 Teaching Lab,,15,REA101M1EBK-0611P
-Euler 229 Teaching Lab,,25,REA101M1HBK-0811P
-Euler 229 Teaching Lab,,25,RGA4R7M1HBK-0511G
-Euler 229 Teaching Lab,,,UPW1A222MHD
-Euler 229 Teaching Lab,,20,USF1V150MDD
-Euler 229 Teaching Lab,,10,UVR1E471MPD
-Euler 229 Teaching Lab,,2,UVR1HR22MDD
-Euler 229 Teaching Lab,,10,T73XW203KT20
-Euler 229 Teaching Lab,,100,ERJ-6ENF1002V
-Euler 229 Teaching Lab,,100,ERJ-6ENF1004V
-Euler 229 Teaching Lab,,50,271-1.0M-RC
-Euler 229 Teaching Lab,,50,271-100K-RC
-Euler 229 Teaching Lab,,50,271-100-RC
-Euler 229 Teaching Lab,,50,271-10K-RC
-Euler 229 Teaching Lab,,50,271-10-RC
-Euler 229 Teaching Lab,,50,271-1K-RC
-Euler 229 Teaching Lab,,50,271-200K-RC
-Euler 229 Teaching Lab,,50,271-20K-RC
-Euler 229 Teaching Lab,,25,271-220-RC
-Euler 229 Teaching Lab,,100,271-2K-RC
-Euler 229 Teaching Lab,,100,271-47-RC
-Euler 229 Teaching Lab,,25,271-49.9K-RC
-Euler 229 Teaching Lab,,100,291-5.1-RC
-Euler 229 Teaching Lab,,25,291-560-RC
-Euler 229 Teaching Lab,,100,603-MFR-25FBF52-10R
-Euler 229 Teaching Lab,,50,MF1/4DC1R00F
-Euler 229 Teaching Lab,,50,MFR-25FRF52-20K
-Euler 229 Teaching Lab,,50,2N3904TAR
-Euler 229 Teaching Lab,,50,2N7000TA
-Euler 229 Teaching Lab,,5,MJE3055TTU
-Euler 229 Teaching Lab,,1,LM4040D25ILPR
-Euler 229 Teaching Lab,,10,TL431CZ-AP
-Euler 229 Teaching Lab,,10,LM78L05ACZX
-Euler 229 Teaching Lab,,10,SPX1117M3-L-3-3/TR
-Euler 229 Teaching Lab,,4,1-2199298-2
-Euler 229 Teaching Lab,,20,1-2199298-3
-Euler 229 Teaching Lab,,10,158-P02EK381V2-E
-Euler 229 Teaching Lab,,6,AI-155
-Euler 229 Teaching Lab,,10,PJ-102AH
-Euler 229 Teaching Lab,,9,220ADC16
-Euler 229 Teaching Lab,,50,TL1105FF100Q";
-
 my $fname = 'inputdata.txt';
 open my $fhandle, '<', $fname or die $!;
 my @lines = (<$fhandle>); # grab entire file by lines into array
@@ -138,7 +62,7 @@ chomp(@lines); # get rid of last character, \n
     # Number of part numbers (rows) input.
 print "Length of lines: ", scalar @lines, "\n";
     # In the end the partCount should equal the number in @lines
-my $partCount = 1; # Count each part looked up for output line
+my $partCount = 1; # init - Count each part looked up for output line
 
 # Headers Example
 # *Item Searched	Item	Description	MPN	Manufacturer	Vendor PN	Vendor					Category	Type	Location	Location 2	Quantity	Item	
@@ -181,29 +105,7 @@ foreach (@lines)
     $partLoc{$partx} = [@rowOfFields];
 #    die "\nStop here!\n";
 }
-# die "\nStop here!\n";
 
-# Get all the lines by splitting on newline
-# @lines = split "\n", $inStr;
-#    my %partLoc = (); # Part location based on array above
-#    my @partsOrder = (); # ordering of parts in the input spreadsheet file
-
-# Loop for processing each part
-#foreach (@lines)
-#{
-#    # Get information already known about part
-#    # location, location 2, quantity, and part number
-#    my ($rm, $loc, $qty, $partx) = split ",", $_; # comma delimited
-# #   my ($rm, $loc, $qty, $partx) = split "\t", $_; # tab delimited
-#        # Make the part the key to an array of room, loc & qty
-#    $rm = 'rm na' unless($rm);
-#    $loc = 'loc na' unless($loc);
-#    $qty = 'qty na' unless($qty);
-#        # keep ordered list of the part names
-#    push @partsOrder, $partx;
-#        # Put array in hash indexed by part name
-#    $partLoc{$partx} = [($rm, $loc, $qty)]; 
-#}
     # test group of part names
 my @mpn = qw( 1N5235BTR 1N5251B 1N5819 512-1N5231B 1N5231B);
 
@@ -283,7 +185,7 @@ print "\n*********************************** end program $0  program.***********
 sub getPart
 {
     my $part = shift;   # Get part name
-    sleep(0.95); # Avoid Octopart rate limit (in msec)
+#    sleep(0.95); # Avoid Octopart rate limit (in msec) - no effect
     $octopart->GET('/api/v3/parts/match'
                     . '?' . 'apikey=4ed77e1e'
                     . '&' . "queries=[{\"mpn\":\"$part\"}]"
@@ -308,7 +210,6 @@ sub getPart
         print "\n";
     }
     
-
     my $json = JSON->new->allow_nonref;
     my $jsonDecode = $json->decode($octopart->responseContent());
 
@@ -396,25 +297,17 @@ sub getPart
             getItems($Part, $i);
         }
     }
-#    foreach my $c (@Category_UIDS)
-#    {
-#        getCategory($json, $c);
-#    }
+
+    foreach my $cate (@Category_UIDS)
+    {
+        getCategory($json, $cate)
+    }
+
     # only call getCategory once
     getCategory($json, $Category_UIDS[0]) if ($Category_UIDS[0]);
     $GSvalues{'Category'} =  $Categories[0] if $Categories[0];
 
-#    foreach my $c (@Category_UIDS)
-#    {
-#        print "all cat uids: $c\n";
-#    }
-    #____________________________
-#    print "\nNumber of Categories: ", scalar @Categories, "\n";
-#    foreach my $c (@Categories)
-#    {
-#        print "all categories: $c\n";
-#    }
-    
+    #____________________________    
         # Removing duplicate strings from an array
         # http://www.perlmonks.org/?node_id=604547
         # Hash slices explained
@@ -422,18 +315,12 @@ sub getPart
     my (%hashput, @unique);
     unless(@Categories)
     {
-#        %hashput;
         @hashput{@Categories} = (); # use hash keys to get rid of dups
         @unique = sort keys %hashput; # unique sorted specs
         print "\nNumber of Sorted Categories: ", scalar @unique, "\n" if $verbose;
         map {print "all sorted categories: $_\n"} @unique if $verbose;
     }
     #____________________________
-#    print "\nNumber of Specs: ", scalar @Specifications, "\n";
-#    foreach my $s (@Specifications)
-#    {
-#        print "all spec: $s\n";
-#    }
     unless(scalar @Specifications)
     {
         %hashput = ();
@@ -443,11 +330,6 @@ sub getPart
         map {print "all sorted spec: $_\n"} @unique if $verbose;
     }
     #____________________________
-#    print "\nNumber of Desc: ", scalar @Descriptions, "\n";
-#    foreach my $d (@Descriptions)
-#    {
-#        print "all desc: $d\n";
-#    }
     unless(scalar @Descriptions)
     {
         %hashput = ();
@@ -457,12 +339,6 @@ sub getPart
         map {print "all sorted desc: $_\n"} @unique if $verbose;
     }
     #____________________________
-    
-#    print "\nNumber of Short Desc: ", scalar @Short_Descriptions, "\n";
-#    foreach my $d (@Short_Descriptions)
-#    {
-#        print "all short desc: $d\n";
-#    }
     unless(scalar @Short_Descriptions)
     {
         %hashput = ();
@@ -513,19 +389,23 @@ sub getPart
 sub getCategory
 {
     my ($json, $c) = @_;
-    sleep(0.95);
+    sleep(0.5);
     $octopart->GET("/api/v3/categories/$c"
                     . '?' . 'apikey=4ed77e1e');
-    
-#    $octopart->GET('/api/v3/categories/get_multi'
-#                    . '?' . 'apikey=4ed77e1e'
-#                    . '&' . "queries=[{\"$c\"}]"
-#                    );
-    unless ($octopart->responseCode() == 200){
-        print "*======== HTTP request category responseCode: ", $octopart->responseCode(), " Category: ", $c, "\n";
+
+    my $rc = $octopart->responseCode();
+    unless ($rc == 200){
+        print "*======== HTTP request category responseCode: ", $octopart->responseCode(), " Category: ", $c;
+        if($rc == 429) # Hit rate limit of 3 requests per second
+        {
+            print " Hit rate limit!";
+            sleep(1);
+        }
+        print "\n";
     }
 
         my $Category = $json->decode($octopart->responseContent());
+        print "category UID: $c, name: ", $Category->{'name'}, "\n";
         push @Categories, $Category->{'name'};
         
         # Sample category data structure
@@ -650,7 +530,21 @@ sub getItems
         }
     }
     
-    
+#SCHEMA        Category schema:
+#SCHEMA        Property	        Description	                                   Example	                Empty Value
+#SCHEMA        uid	            64-bit unique identifier	                   "b62d7b27870d6dea"	    n/a
+#SCHEMA        name	            The category node's name	                   "Capacitors"	            n/a
+#SCHEMA        parent_uid	    64-bit unique identifier of parent 
+#SCHEMA                         category node	                               "ab34663e9a1770f3"	    null
+#SCHEMA        children_uids	JSON array of children uid's	               ["d9ed14e7e8cc022a", 
+#SCHEMA                                                                        "41398c33764e9afe"]	    []
+#SCHEMA        ancestor_uids	JSON array of ancestor uid's with parent
+#SCHEMA                         ordered last	                                ["55da98d064fd8e1d", 
+#SCHEMA                                                                         "ab34663e9a1770f3"]	    []
+#SCHEMA        ancestor_names	JSON array of ancestor node names	            ["Electronic Parts", 
+#SCHEMA                                                                         "Passive Components"]	[]
+#SCHEMA        num_parts	    Number of parts categorized in category node	1000000	                null
+#SCHEMA        imagesets	    Hidden by default (See Include Directives)	    [<ImageSet object>]	    []
     
     my $Categories = $Part->[$_]->{'category_uids'};
     foreach my $c (@$Categories)
@@ -659,10 +553,43 @@ sub getItems
         push @Category_UIDS, $c;
     }   
     
+#SCHEMA        PartOffer schema:
+#SCHEMA        Property	            Description	                                    Example	                               Empty Value
+#SCHEMA        sku	                The seller's part number	                    "67K1122"	                           n/a
+#SCHEMA        seller	            Object representing the seller	                <Seller object>	                       n/a
+#SCHEMA        eligible_region	    The (ISO 3166-1 alpha-2) or (ISO 3166-2) 
+#SCHEMA                             code indicating the geo-political  
+#SCHEMA                             region(s) for which offer is valid	            "US-NY"	                               null
+#SCHEMA        product_url	        URL for seller landing page	                    "http://octopart.com/redirect/XXXX"	   null
+#SCHEMA        octopart_rfq_url	    URL for generating RFQ through Octopart	        "http://octopart.com/rfq/XXXX"	       null
+#SCHEMA        prices	            Dictionary mapping currencies to lists 
+#SCHEMA                             of (Break, Price) tuples	                    See notes: PartOffer.prices	           n/a
+#SCHEMA        in_stock_quantity	Number of parts seller has available	        See notes: PartOffer.in_stock_quantity n/a
+#SCHEMA        on_order_quantity	Number of parts on order from factory	        2000	                               null
+#SCHEMA        on_order_eta	        ISO 8601 formatted ETA of order from factory    "2017-10-29T12:00:00Z"	               null
+#SCHEMA        factory_lead_days	Number of days to acquire parts from factory	42	                                   null
+#SCHEMA        factory_order_multiple	Order multiple for factory orders	        1000	                               null
+#SCHEMA        order_multiple	    Number of items which must be ordered together	See notes: PartOffer.order_multiple	   null
+#SCHEMA        moq	                Minimum order quantity	100	null
+#SCHEMA        packaging	        Form of offer packaging (e.g. reel, tape)	    See notes: PartOffer.packaging	       null
+#SCHEMA        is_authorized	    True if seller is authorized by manufacturer	See notes: PartOffer.is_authorized	   n/a
+#SCHEMA        last_updated	        ISO 8601 formatted time when offer was last 
+#SCHEMA                             updated by the seller	                        "2017-10-18T07:12:00Z"	               n/a
+
     my $Offers = $Part->[$_]->{'offers'};
     foreach my $o (@$Offers)
     {      
         my $seller = $o->{'seller'}; # get seller object
+        
+#SCHEMA        Seller schema:
+#SCHEMA        Property	        Description	                    Example	                 Empty Value
+#SCHEMA        uid	            64-bit unique identifier	    "4a258f2f6a2199e2"	     n/a
+#SCHEMA        name	            The seller's display name	    "Newark"	             n/a
+#SCHEMA        homepage_url	    The seller's homepage url	    "http://example.com"	 null
+#SCHEMA        display_flag	    ISO 3166 alpha-2 country 
+#SCHEMA                         code for display flag	        "US"	                 null
+#SCHEMA        has_ecommerce	Whether seller has e-commerce	true	                 null
+        
         for (grep /$seller->{'name'}/i, @sellerList)
             {
               print "          Seller Matches: ", $_, "\n"  if $verbose;

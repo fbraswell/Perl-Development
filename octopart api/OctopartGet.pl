@@ -44,14 +44,19 @@ binmode STDOUT, ":utf8"; # get rid of warnings about special characters
 
 use REST::Client;
 use JSON;
+use Time::HiRes qw/gettimeofday/;
+
+my $verbose = 0; # default 0 - Print everything = 1
+my $tod = gettimeofday; # Time of Day
+my $prev_tod = gettimeofday(); # previous Time of Day
+my $ratelimit = 0.5; # rate which calls can be made in seconds
+
 
 print "\n*********************************** start program $0 program.***********************************\n";
 # Part numbers go here
 
 my $pnum = shift;
 print "command line input: $pnum\n" if $pnum;
-
-my $verbose = 1; # default 0 - Print everything = 1
 
 my $fname = 'inputdata.txt';
 open my $fhandle, '<', $fname or die $!;
@@ -179,6 +184,16 @@ my $octopart = REST::Client->new({
 
 foreach (@mpn)
 {
+    @Category_UIDS = ();
+    %Category_UIDS_hash = (); # no dups in hash keys
+    my @Categories = (); # Text 
+    %Categories_hash = (); # Text  # no dups in hash keys 
+    @Descriptions = ();
+    %Descriptions_hash = (); # no dups in hash keys
+    @Short_Descriptions = ();
+    %Short_Descriptions_hash = (); # no dups in hash keys
+    @Specifications = ();
+    %Specifications_hash = (); # no dups in hash keys
     %GSvalues = (); # Init for next spreadsheet row
     print "\nRequest information on: $_\n" if $verbose;
     getPart($_); # Get the information
@@ -192,6 +207,24 @@ sub getPart
 {
     my $part = shift;   # Get part name
 #    sleep(0.95); # Avoid Octopart rate limit (in msec) - no effect
+#    $tod = gettimeofday();
+#    print "---Time elapsed in msec: ", $tod - $prev_tod, "\n";
+#    $prev_tod = $tod;
+    
+    $tod = gettimeofday();   
+    my $elapsedtime = $tod - $prev_tod;
+
+# print "---Category Time elapsed in msec: ", $elapsedtime, "\n";
+    if ($elapsedtime < $ratelimit) # check for rate limit violation
+    {
+        # Need to sleep for a moment to avoid rate limit
+        #    sleep(0.5);
+        # select(undef,undef,undef, 0.5); # sleep - can be for less than 1 sec
+        select(undef,undef,undef, $ratelimit - $elapsedtime); # sleep - can be for less than 1 sec
+    }
+#    print "---Part Time elapsed in sec: ", gettimeofday() - $prev_tod, "\n";
+    $prev_tod = $tod;
+    
     $octopart->GET('/api/v3/parts/match'
                     . '?' . 'apikey=4ed77e1e'
                     . '&' . "queries=[{\"mpn\":\"$part\"}]"
@@ -211,7 +244,7 @@ sub getPart
         if($rc == 429) # Hit rate limit of 3 requests per second
         {
             print " Hit rate limit!";
-            sleep(1);
+ #           sleep(1);
         }
         print "\n";
     }
@@ -304,10 +337,20 @@ sub getPart
         }
     }
 
-    foreach my $cate (@Category_UIDS)
+    if(@Category_UIDS) # get rid of dup UIDS to cut down on category http calls
     {
-        getCategory($json, $cate)
+        @Category_UIDS_hash{@Category_UIDS} = ();
+        print "\nNumber of Sorted hash Category_UIDS: ", scalar keys %Category_UIDS_hash, "\n" if $verbose;
+        map {print "all sorted hash category uids: $_\n"} sort keys %Category_UIDS_hash if $verbose;
+        @Category_UIDS = sort keys %Category_UIDS_hash;
     }
+    
+#    foreach my $cate (@Category_UIDS)
+#    {
+#        getCategory($json, $cate)
+#    }
+    
+    map {getCategory($json, $_)} @Category_UIDS;
 
     # only call getCategory once
     getCategory($json, $Category_UIDS[0]) if ($Category_UIDS[0]);
@@ -318,60 +361,37 @@ sub getPart
         # http://www.perlmonks.org/?node_id=604547
         # Hash slices explained
         # http://www.webquills.net/web-development/perl/perl-5-hash-slices-can-replace.html
-#    my (%hashput, @unique);
+
     if (@Categories) # print information if there are @Categories
     {
         # Create hash to get rid of dups
         @Categories_hash{@Categories} = (); # use hash keys to get rid of dups
         print "\nNumber of Sorted hash Categories: ", scalar keys %Categories_hash, "\n" if $verbose;
         map {print "all sorted hash categories: $_\n"} sort keys %Categories_hash; # if $verbose;
-        
-#        @hashput{@Categories} = (); # use hash keys to get rid of dups
-#        @unique = sort keys %hashput; # unique sorted specs
-#        print "\nNumber of Sorted Categories: ", scalar @unique, "\n" if $verbose;
-#        map {print "all sorted categories: $_\n"} @unique; # if $verbose;
     }
     #____________________________
-    if (scalar @Specifications) # print information if there are @Categories
+    if (scalar @Specifications) # print information if there are @Specifications
     {
         # Create hash to get rid of dups
         @Specifications_hash{@Specifications} = ();
         print "\nNumber of Sorted hash Specs: ", scalar keys %Specifications_hash, "\n" if $verbose;
         map {print "all sorted hash spec: $_\n"} sort keys %Specifications_hash if $verbose;
-        
-#        %hashput = ();
-#        @hashput{@Specifications} = ();
-#        @unique = sort keys %hashput;
-#        print "\nNumber of Sorted Specs: ", scalar @unique, "\n" if $verbose;
-#        map {print "all sorted spec: $_\n"} @unique if $verbose;
     }
     #____________________________
-    if (scalar @Descriptions) # print information if there are @Categories
+    if (scalar @Descriptions) # print information if there are @Descriptions
     {
         # Create hash to get rid of dups
         @Descriptions_hash{@Descriptions} = ();
         print "\nNumber of Sorted hash Desc: ", scalar keys %Descriptions_hash, "\n" if $verbose;
         map {print "all sorted hash desc: $_\n"} sort keys %Descriptions_hash if $verbose;
-        
-#        %hashput = ();
-#        @hashput{@Descriptions} = ();
-#        @unique = sort keys %hashput;
-#        print "\nNumber of Sorted Desc: ", scalar @unique, "\n" if $verbose;
-#        map {print "all sorted desc: $_\n"} @unique if $verbose;
     }
     #____________________________
-    if (scalar @Short_Descriptions) # print information if there are @Categories
+    if (scalar @Short_Descriptions) # print information if there are @Short_Descriptions
     {
         # Create hash to get rid of dups
         @Short_Descriptions_hash{@Short_Descriptions} = ();
         print "\nNumber of Sorted Short hash Desc: ", scalar keys %Short_Descriptions_hash, "\n" if $verbose;
         map {print "all sorted hash short desc: $_\n" if $_} sort keys %Short_Descriptions_hash if $verbose;
-        
-#        %hashput = ();
-#        @hashput{@Short_Descriptions} = ();
-#        @unique = sort keys %hashput;
-#        print "\nNumber of Sorted Short Desc: ", scalar @unique, "\n" if $verbose;
-#        map {print "all sorted short desc: $_\n"} @unique if $verbose;
     }
     #____________________________
     
@@ -383,23 +403,25 @@ sub getPart
         return;
     }
     
-#    my ($l, $l2, $q) = @{$partLoc{$part}};
-#    $GSvalues{'Search'} = $part;
-#    $GSvalues{'Location'} =  $l;
-#    $GSvalues{'Location_2'} =  $l2;
-#    $GSvalues{'Quantity'} =  $q;
-    
     # Fill in items that are already known for the part, 
     # such as location and quantity, in their respective columns
     my @partRow = @{$partLoc{$part}};
-    $GSvalues{'Search'} = $part;
-    $GSvalues{'*Item Searched'} = $part;
-    $GSvalues{'Item'} =  $partRow[$headerNameIndex{'Item'}];
-    $GSvalues{'Location'} =  $partRow[$headerNameIndex{'Location'}];
-    $GSvalues{'Location 2'} =  $partRow[$headerNameIndex{'Location 2'}];
-    $GSvalues{'Quantity'} =  $partRow[$headerNameIndex{'Quantity'}];
+#    $GSvalues{'Search'} = $part;
+#    $GSvalues{'*Item Searched'} = $part;
+#    $GSvalues{'Item'} =  $partRow[$headerNameIndex{'Item'}];
+#    $GSvalues{'Location'} =  $partRow[$headerNameIndex{'Location'}];
+#    $GSvalues{'Location 2'} =  $partRow[$headerNameIndex{'Location 2'}];
+#    $GSvalues{'Quantity'} =  $partRow[$headerNameIndex{'Quantity'}];
     
-    
+    %GSvalues = (
+        Search => $part,
+        '*Item Searched' => $part,
+        Item => $partRow[$headerNameIndex{'Item'}],
+        Location => $partRow[$headerNameIndex{'Location'}],
+        'Location 2' => $partRow[$headerNameIndex{'Location 2'}],
+        Quantity => $partRow[$headerNameIndex{'Quantity'}],
+    );
+      
     print "Spreadsheet Columns\n" if $verbose;
 
         # Print the spreadsheet columns with hash keys from header labels
@@ -417,9 +439,26 @@ sub getPart
 sub getCategory
 {
     my ($json, $c) = @_;
-    sleep(0.5);
+#    sleep(0.5);
+#    select(undef,undef,undef, 0.5); # sleep - can be for less than 1 sec
+    $tod = gettimeofday();   
+    my $elapsedtime = $tod - $prev_tod;
+
+# print "---Category Time elapsed in msec: ", $elapsedtime, "\n";
+    if ($elapsedtime < $ratelimit) # check for rate limit violation
+    {
+        # Need to sleep for a moment to avoid rate limit
+        #    sleep(0.5);
+        # select(undef,undef,undef, 0.5); # sleep - can be for less than 1 sec
+        select(undef,undef,undef, $ratelimit - $elapsedtime); # sleep - can be for less than 1 sec
+    }
+#    print "---Category Time elapsed in sec: ", gettimeofday() - $prev_tod, "\n";
+    $prev_tod = $tod;
     $octopart->GET("/api/v3/categories/$c"
                     . '?' . 'apikey=4ed77e1e');
+                    
+# Eventually try multi get categories                    
+# GET /categories/get_multi - Fetch multiple categories simultaneously
 
     my $rc = $octopart->responseCode();
     unless ($rc == 200){
@@ -427,14 +466,14 @@ sub getCategory
         if($rc == 429) # Hit rate limit of 3 requests per second
         {
             print " Hit rate limit!";
-            sleep(1);
+#            sleep(1);
         }
         print "\n";
     }
 
         my $Category = $json->decode($octopart->responseContent());
  #       print "category UID: $c, name: ", $Category->{'name'}, "\n";
-        push @Categories, $Category->{'name'};
+        push @Categories, $Category->{'name'} if $Category->{'name'};
         
         # Sample category data structure
  #       {"ancestor_names": ["Electronic Parts", "Passive Components", "Resistors"], "uid": "91ee5ce4a8204a29", "num_parts": 708565, "ancestor_uids": ["8a1e4714bb3951d9", "7542b8484461ae85", "5c6a91606d4187ad"], "children_uids": [], "__class__": "Category", "parent_uid": "5c6a91606d4187ad", "name": "Through-Hole Resistors"}      
@@ -484,7 +523,7 @@ sub getItems
     printResult("items $_ class: ", $Part->[$_]->{'__class__'}) if $verbose;
     printResult("items $_ mpn: ", $Part->[$_]->{'mpn'}) if $verbose;
     printResult("items $_ short desc: ", $Part->[$_]->{'short_description'}) if $verbose;
-    push @Short_Descriptions, $Part->[$_]->{'short_description'};
+    push @Short_Descriptions, $Part->[$_]->{'short_description'} if $Part->[$_]->{'short_description'};
     
     printResult("items $_ octopart url: ", $Part->[$_]->{'octopart_url'}) if $verbose;
     
@@ -574,14 +613,8 @@ sub getItems
 #SCHEMA        num_parts	    Number of parts categorized in category node	1000000	                null
 #SCHEMA        imagesets	    Hidden by default (See Include Directives)	    [<ImageSet object>]	    []
     
-    push @Category_UIDS, @{$Part->[$_]->{'category_uids'}};
-    
-#    my $Categories = $Part->[$_]->{'category_uids'};
-#    foreach my $c (@$Categories)
-#    {
-# #       print " Category id: $c\n";
-#        push @Category_UIDS, $c;
-#    }   
+    # Add additional category uids to @Category_UIDS array
+    push @Category_UIDS, @{$Part->[$_]->{'category_uids'}};  
     
 #SCHEMA        PartOffer schema:
 #SCHEMA        Property	            Description	                                    Example	                               Empty Value

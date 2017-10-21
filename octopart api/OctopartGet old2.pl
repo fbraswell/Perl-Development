@@ -51,7 +51,7 @@ print "\n*********************************** start program $0 program.**********
 my $pnum = shift;
 print "command line input: $pnum\n" if $pnum;
 
-my $verbose = 1; # default 0 - Print everything = 1
+my $verbose = 0; # default 0 - Print everything = 1
 
 my $fname = 'inputdata.txt';
 open my $fhandle, '<', $fname or die $!;
@@ -150,17 +150,11 @@ map {print $_, ", "} @sellerList if $verbose;
 print "\n";
     # Init data structures 
 my @Category_UIDS = ();
-my %Category_UIDS_hash = (); # no dups in hash keys
 my @Categories = (); # Text 
-my %Categories_hash = (); # Text  # no dups in hash keys 
 my @Descriptions = ();
-my %Descriptions_hash = (); # no dups in hash keys
 my @Short_Descriptions = ();
-my %Short_Descriptions_hash = (); # no dups in hash keys
-my @Specifications = ();
-my %Specifications_hash = (); # no dups in hash keys
 my $requestedPN;
-
+my @Specifications = ();
 
 # CURL Command
 #	Franks-iMac:BerryGlobal frankbraswell$ curl -G http://octopart.com/api/v3/parts/match \
@@ -318,60 +312,40 @@ sub getPart
         # http://www.perlmonks.org/?node_id=604547
         # Hash slices explained
         # http://www.webquills.net/web-development/perl/perl-5-hash-slices-can-replace.html
-#    my (%hashput, @unique);
-    if (@Categories) # print information if there are @Categories
+    my (%hashput, @unique);
+    unless(@Categories)
     {
-        # Create hash to get rid of dups
-        @Categories_hash{@Categories} = (); # use hash keys to get rid of dups
-        print "\nNumber of Sorted hash Categories: ", scalar keys %Categories_hash, "\n" if $verbose;
-        map {print "all sorted hash categories: $_\n"} sort keys %Categories_hash; # if $verbose;
-        
-#        @hashput{@Categories} = (); # use hash keys to get rid of dups
-#        @unique = sort keys %hashput; # unique sorted specs
-#        print "\nNumber of Sorted Categories: ", scalar @unique, "\n" if $verbose;
-#        map {print "all sorted categories: $_\n"} @unique; # if $verbose;
+        @hashput{@Categories} = (); # use hash keys to get rid of dups
+        @unique = sort keys %hashput; # unique sorted specs
+        print "\nNumber of Sorted Categories: ", scalar @unique, "\n" if $verbose;
+        map {print "all sorted categories: $_\n"} @unique if $verbose;
     }
     #____________________________
-    if (scalar @Specifications) # print information if there are @Categories
+    unless(scalar @Specifications)
     {
-        # Create hash to get rid of dups
-        @Specifications_hash{@Specifications} = ();
-        print "\nNumber of Sorted hash Specs: ", scalar keys %Specifications_hash, "\n" if $verbose;
-        map {print "all sorted hash spec: $_\n"} sort keys %Specifications_hash if $verbose;
-        
-#        %hashput = ();
-#        @hashput{@Specifications} = ();
-#        @unique = sort keys %hashput;
-#        print "\nNumber of Sorted Specs: ", scalar @unique, "\n" if $verbose;
-#        map {print "all sorted spec: $_\n"} @unique if $verbose;
+        %hashput = ();
+        @hashput{@Specifications} = ();
+        @unique = sort keys %hashput;
+        print "\nNumber of Sorted Specs: ", scalar @unique, "\n" if $verbose;
+        map {print "all sorted spec: $_\n"} @unique if $verbose;
     }
     #____________________________
-    if (scalar @Descriptions) # print information if there are @Categories
+    unless(scalar @Descriptions)
     {
-        # Create hash to get rid of dups
-        @Descriptions_hash{@Descriptions} = ();
-        print "\nNumber of Sorted hash Desc: ", scalar keys %Descriptions_hash, "\n" if $verbose;
-        map {print "all sorted hash desc: $_\n"} sort keys %Descriptions_hash if $verbose;
-        
-#        %hashput = ();
-#        @hashput{@Descriptions} = ();
-#        @unique = sort keys %hashput;
-#        print "\nNumber of Sorted Desc: ", scalar @unique, "\n" if $verbose;
-#        map {print "all sorted desc: $_\n"} @unique if $verbose;
+        %hashput = ();
+        @hashput{@Descriptions} = ();
+        @unique = sort keys %hashput;
+        print "\nNumber of Sorted Desc: ", scalar @unique, "\n" if $verbose;
+        map {print "all sorted desc: $_\n"} @unique if $verbose;
     }
     #____________________________
-    if (scalar @Short_Descriptions) # print information if there are @Categories
+    unless(scalar @Short_Descriptions)
     {
-        # Create hash to get rid of dups
-        @Short_Descriptions_hash{@Short_Descriptions} = ();
-        print "\nNumber of Sorted Short hash Desc: ", scalar keys %Short_Descriptions_hash, "\n" if $verbose;
-        map {print "all sorted hash short desc: $_\n" if $_} sort keys %Short_Descriptions_hash if $verbose;
-        
-#        %hashput = ();
-#        @hashput{@Short_Descriptions} = ();
-#        @unique = sort keys %hashput;
-#        print "\nNumber of Sorted Short Desc: ", scalar @unique, "\n" if $verbose;
-#        map {print "all sorted short desc: $_\n"} @unique if $verbose;
+        %hashput = ();
+        @hashput{@Short_Descriptions} = ();
+        @unique = sort keys %hashput;
+        print "\nNumber of Sorted Short Desc: ", scalar @unique, "\n" if $verbose;
+        map {print "all sorted short desc: $_\n"} @unique if $verbose;
     }
     #____________________________
     
@@ -389,8 +363,6 @@ sub getPart
 #    $GSvalues{'Location_2'} =  $l2;
 #    $GSvalues{'Quantity'} =  $q;
     
-    # Fill in items that are already known for the part, 
-    # such as location and quantity, in their respective columns
     my @partRow = @{$partLoc{$part}};
     $GSvalues{'Search'} = $part;
     $GSvalues{'*Item Searched'} = $part;
@@ -433,7 +405,7 @@ sub getCategory
     }
 
         my $Category = $json->decode($octopart->responseContent());
- #       print "category UID: $c, name: ", $Category->{'name'}, "\n";
+        print "category UID: $c, name: ", $Category->{'name'}, "\n";
         push @Categories, $Category->{'name'};
         
         # Sample category data structure
@@ -574,14 +546,12 @@ sub getItems
 #SCHEMA        num_parts	    Number of parts categorized in category node	1000000	                null
 #SCHEMA        imagesets	    Hidden by default (See Include Directives)	    [<ImageSet object>]	    []
     
-    push @Category_UIDS, @{$Part->[$_]->{'category_uids'}};
-    
-#    my $Categories = $Part->[$_]->{'category_uids'};
-#    foreach my $c (@$Categories)
-#    {
-# #       print " Category id: $c\n";
-#        push @Category_UIDS, $c;
-#    }   
+    my $Categories = $Part->[$_]->{'category_uids'};
+    foreach my $c (@$Categories)
+    {
+ #       print " Category id: $c\n";
+        push @Category_UIDS, $c;
+    }   
     
 #SCHEMA        PartOffer schema:
 #SCHEMA        Property	            Description	                                    Example	                               Empty Value

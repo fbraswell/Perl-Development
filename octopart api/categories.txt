@@ -1,0 +1,39 @@
+sorted all categories: Aluminum Electrolytic Capacitors, UID e7ca2ac0de173c0d
+sorted all categories: Amplifiers - Op Amps, Buffer, Instrumentation, UID 181ad51029e0c3dd
+sorted all categories: Audio Products, UID 8c8c4186bc1a574b
+sorted all categories: BJTs, UID b814751e89ff63d3
+sorted all categories: Buffers, Drivers and Transceivers, UID 263deb371f9afdfa
+sorted all categories: Capacitors, UID f8883582c9a8234f
+sorted all categories: Ceramic Capacitors, UID f6473b4dcf9d2d80
+sorted all categories: Chip SMD Resistors, UID a2f46ffe9b377933
+sorted all categories: Clock Buffers, Drivers, UID 7247bf4d4384a980
+sorted all categories: Clock and Timing, UID bec473ce8f066503
+sorted all categories: DIP Switches, UID 7787ba8d4431ac40
+sorted all categories: Diodes, UID 87a44aaeb6be5c63
+sorted all categories: Discrete Semiconductors, UID 3b27f62d0a3ae0e0
+sorted all categories: Electromechanical, UID 9b085602a2c840cf
+sorted all categories: Flashlights, UID 6172ac785344bab5
+sorted all categories: Integrated Circuits (ICs), UID 9e07530daf1645c0
+sorted all categories: LEDs, UID 0dd3c0d93d8cd614
+sorted all categories: Linear ICs, UID 08b8c5b23945d37f
+sorted all categories: Logic Gates, UID 1a2bd7212bffc1ec
+sorted all categories: Logic ICs, UID 9e37533dafe045f0
+sorted all categories: MOSFETs, UID e7b12abbd6523c76
+sorted all categories: Microphones, UID 2e6ee3641d0ff5a9
+sorted all categories: Optoelectronics, UID 848d4987b4d35f4a
+sorted all categories: Passive Components, UID 7542b8484461ae85
+sorted all categories: Power Management ICs, UID 56439b4967f48d84
+sorted all categories: Rectifier Diodes, UID c85a0550f9be139d
+sorted all categories: Resistors, UID 5c6a91606d4187ad
+sorted all categories: Rotary Switches, UID 2b1be61118b2f0dc
+sorted all categories: Schottky Diodes, UID a3416e4b92a47886
+sorted all categories: Speakers, UID 3ab6f7bc09c5e171
+sorted all categories: Switches, UID 8ce341e9bf4c5724
+sorted all categories: Tactile Switches, UID a9a064aa9a0a7267
+sorted all categories: Through-Hole Resistors, UID 91ee5ce4a8204a29
+sorted all categories: Tools and Supplies, UID 67e2aae855bcbc25
+sorted all categories: Transistors, UID d77d1a77e69f0cba
+sorted all categories: Variable Resistors and Potentiometers, UID cda900a3fc9b166e
+sorted all categories: Voltage References, UID 05f7c8fd3444de30
+sorted all categories: Voltage Regulators - Linear, UID bad177db8b576116
+sorted all categories: Zener Diodes, UID d1b41cbee0af0a73

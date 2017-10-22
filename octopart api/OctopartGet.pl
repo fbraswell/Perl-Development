@@ -3,13 +3,16 @@ use strict;
 use warnings;
 
 # This program imports tab delimited data  in file 'inputdata.txt' 
-# which includes manufacturers part numbers.
+# which includes manufacturers part numbers. The first row must be label information.
 # It looks up the part information on Octopart and populates the information for each part
 # in a tab delimited output file.
 
 # Confused between versions of Perl
 # Installed JSON module for Perl but cannot load it, Can't locate JSON.pm in @INC
 # https://stackoverflow.com/questions/41143638/installed-json-module-for-perl-but-cannot-load-it-cant-locate-json-pm-in-inc
+
+# Perl is short for " Practical Extraction and Report Language," 
+# although it has also been called a "Pathologically Eclectic Rubbish Lister,"
 
 # Octopart REST API Reference (V3)
 # https://octopart.com/api/docs/v3/rest-api 
@@ -47,10 +50,49 @@ use JSON;
 use Time::HiRes qw/gettimeofday/;
 
 my $verbose = 0; # default 0 - Print everything = 1
+my $fname = 'inputdata.txt'; # Input file name
+my $cname = 'categories.txt'; # file with category information
 my $tod = gettimeofday; # Time of Day
 my $prev_tod = gettimeofday(); # previous Time of Day
 my $ratelimit = 0.5; # rate which calls can be made in seconds
 
+my @headersRow; # Row of headers - first line of file  
+my %headerNameIndex; # Need to know the index of each header name
+my %partLoc = (); # Part location based on array above
+my @partsOrder = (); # ordering of parts in the input spreadsheet file
+# my $i = 0; # Count the input lines and parts
+
+my @mpn; # List of manufacturer part numbers - drives program, line by line
+my @GSheaders; # Header information, first row, for output file
+my %GSvalues = (); # init Hash for the values of each row of spreadsheet
+my $partCount = 1; # init - Count each part looked up for output line
+    # Narrow down the list of seller to these vendors
+my @sellerList = ('Newark', 'Digi-Key', 'Mouser', 'Arrow', 'element14');
+my $octopart; 
+    # Init data structures 
+my %AllCatagories = (); # Keep track of all catagories (key) & UIDS (val) found across parts
+my %AllInputCategories = (); # all categories input from file
+# my @AllCategory_UIDS = (); # Collect all category UIDS found across parts
+my @Category_UIDS = (); # Collect all category UIDS
+my %Category_UIDS_hash = (); # no dups in hash keys
+my @Categories = (); # Collect all categories 
+my %Categories_hash = (); # Text  # no dups in hash keys 
+my @Descriptions = (); # Collect all descriptions
+my %Descriptions_hash = (); # no dups in hash keys
+my @Short_Descriptions = (); # Collect all short descriptions
+my %Short_Descriptions_hash = (); # no dups in hash keys
+my @Specifications = (); # Collect all specification information
+my %Specifications_hash = (); # no dups in hash keys
+my @Manufacturers = (); # Collect all manufacturers
+my %Manufacturers_hash = ();  # no dups in hash keys
+my @Manufacturers_pn = (); # Collect all mpns
+my %Manufacturers_pn_hash = ();  # no dups in hash keys
+my @Vendors = (); # Collect all vendors
+my %Vendors_hash = (); # no dups in hash keys
+my @Vendors_pn = (); # Collect all vendors part numbers
+my %Vendors_pn_hash = (); # no dups in hash keys
+my @Pricing = (); # array of [qty, price] information 
+my $requestedPN;
 
 print "\n*********************************** start program $0 program.***********************************\n";
 # Part numbers go here
@@ -58,7 +100,20 @@ print "\n*********************************** start program $0 program.**********
 my $pnum = shift;
 print "command line input: $pnum\n" if $pnum;
 
-my $fname = 'inputdata.txt';
+# Get categories & UIDs from file - input line looks like VVVV
+# sorted all categories: Buffers, Drivers and Transceivers, UID 263deb371f9afdfa
+
+open my $chandle, '<', $cname or die $!;
+my @clines = (<$chandle>); # grab entire file by lines into array
+close($chandle);
+print "Number of category file lines: ", scalar @clines, "\n";
+# Parse the line, locate the name and uid and save them in %AllInputCategories
+# Keys are uid and value is name, so it can be looked up by uid later in program
+map {my($name, $uid) = /sorted all categories: (.*), UID (.*)/; $AllInputCategories{$uid} = $name} @clines;
+
+map {print "category: $AllInputCategories{$_}, UID: $_\n"} sort keys %AllInputCategories;
+
+# my $fname = 'inputdata.txt';
 open my $fhandle, '<', $fname or die $!;
 my @lines = (<$fhandle>); # grab entire file by lines into array
 close($fhandle);
@@ -67,20 +122,21 @@ chomp(@lines); # get rid of last character, \n
     # Number of part numbers (rows) input.
 print "Length of lines: ", scalar @lines, "\n";
     # In the end the partCount should equal the number in @lines
-my $partCount = 1; # init - Count each part looked up for output line
+# my $partCount = 1; # init - Count each part looked up for output line
 
 # Headers Example
 # *Item Searched	Item	Description	MPN	Manufacturer	Vendor PN	Vendor					Category	Type	Location	Location 2	Quantity	Item	
 # my @headersRow = qw (*Item Searched	Item	Description	MPN	Manufacturer	Vendor PN	Vendor					Category	Type	Location	Location 2	Quantity	Search);
 
     # First row must be the column names! - Headers
-my @headersRow = split "\t", shift @lines;
+# my @headersRow = split "\t", shift @lines;
+@headersRow = split "\t", shift @lines;
 print "Headers: ";
 map {print "$_, "} @headersRow;
 print "\n";
 
     # Need to know the index of each header name
-my %headerNameIndex;
+# my %headerNameIndex;
     # Put header names in as keys & indexes as values using slice
 @headerNameIndex{@headersRow} = (0..$#headersRow);
 
@@ -90,10 +146,10 @@ foreach my $key (keys %headerNameIndex)
 }
 # die "\nstop here\n";
 
-my %partLoc = (); # Part location based on array above
-my @partsOrder = (); # ordering of parts in the input spreadsheet file
+# my %partLoc = (); # Part location based on array above
+# my @partsOrder = (); # ordering of parts in the input spreadsheet file
 # Organize input information according to the header labels
-my $i = 0;
+my $i = 0; # Count input lines
 foreach (@lines)
 {
     my @rowOfFields = split "\t", $_; # split line on tabs
@@ -106,87 +162,71 @@ foreach (@lines)
         # Keep ordered list of part names
     push @partsOrder, $partx;
         # Put part information in partLoc hash
-        # Store the address of @rowOfFields in hash location $partx
+        # Store the address of @rowOfFields in hash location $partx using square brackets [] operator
     $partLoc{$partx} = [@rowOfFields];
 #    die "\nStop here!\n";
 }
 
     # test group of part names
-my @mpn = qw( 1N5235BTR 1N5251B 1N5819 512-1N5231B 1N5231B);
+# my @mpn = qw( 1N5235BTR 1N5251B 1N5819 512-1N5231B 1N5231B);
 
-@mpn = @partsOrder;
+@mpn = @partsOrder; # list of parts from input file becomes @mpn to look up with api
 print "\n____Parts found: ", scalar @mpn ,"\n";
 map { print "$_ "} @mpn;
 print "\n____End Parts\n";
 
-    # If a part is in the command line
-@mpn =  ($pnum) if $pnum;
+    # If a part is in the command line - NOUSE
+# @mpn =  ($pnum) if $pnum;
 
 # ordering for the GS header
 #    my @GSheaders = qw(Value    Search	Item	Description	MPN	
 #                        Manufacturer  Vendor_PN	Vendor	Category	
 #                        Type	Location	Location 2	Quantity);
                     
-my @GSheaders = @headersRow;
+# my @GSheaders = @headersRow;
+@GSheaders = @headersRow;
     # init Hash for the values of each row of spreadsheet
-my %GSvalues = ();
+# my %GSvalues = ();
 print "GSheader: " if $verbose;
     # Comma separated
 # map {print $_, ', '} @GSheaders; 
     # Tab separated
 map {print $_, "\t"} @GSheaders; 
 print "\n";
-    # May be used for categories/classes later
-my @partClassArray = (
-'ADAPTER','BAT','CAP','CBL','CON',
-'DIODE','DISP','ELEC-MECH','HDR',
-'HS','IC','IND','LED',
-'MIC','MODULE','MOTOR','PCB',
-'PROTOTYPING','PS','RES','SOCKET',
-'SPKR','SW','TERM-BLCK','TRANS',
-'WIRE','XFRMR','HWR',
-);
-    # Narrow down the list of seller to these vendors
-my @sellerList = (
-    'Newark', 'Digi-Key', 'Mouser', 'Arrow', 'element14',
-);
+
+#        # Narrow down the list of seller to these vendors
+#    my @sellerList = (
+#        'Newark', 'Digi-Key', 'Mouser', 'Arrow', 'element14',
+#    );
 print "Seller list: " if $verbose;
 map {print $_, ", "} @sellerList if $verbose;
 print "\n";
-    # Init data structures 
-my @Category_UIDS = ();
-my %Category_UIDS_hash = (); # no dups in hash keys
-my @Categories = (); # Text 
-my %Categories_hash = (); # Text  # no dups in hash keys 
-my @Descriptions = ();
-my %Descriptions_hash = (); # no dups in hash keys
-my @Short_Descriptions = ();
-my %Short_Descriptions_hash = (); # no dups in hash keys
-my @Specifications = ();
-my %Specifications_hash = (); # no dups in hash keys
-my $requestedPN;
+#        # Init data structures 
+#    my %AllCatagories = (); # Keep track of all catagories found across parts
+#    my @Category_UIDS = ();
+#    my %Category_UIDS_hash = (); # no dups in hash keys
+#    my @Categories = (); # Text 
+#    my %Categories_hash = (); # Text  # no dups in hash keys 
+#    my @Descriptions = ();
+#    my %Descriptions_hash = (); # no dups in hash keys
+#    my @Short_Descriptions = ();
+#    my %Short_Descriptions_hash = (); # no dups in hash keys
+#    my @Specifications = ();
+#    my %Specifications_hash = (); # no dups in hash keys
+#    my $requestedPN;
 
-
-# CURL Command
-#	Franks-iMac:BerryGlobal frankbraswell$ curl -G http://octopart.com/api/v3/parts/match \
-#	> -d queries="[{\"mpn\":\"2n7000\"}]" \
-#	> -d apikey=4ed77e1e \
-#	> -d pretty_print=true   \
-#	> -d include[]=specs \
-#	> -d include[]=descriptions
-# my $octopart;
-# $uri->query_form( $key1 => $val1, $key2 => $val2, ... )
     # Create Octopart object
-my $octopart = REST::Client->new({
+#    my $octopart = REST::Client->new({
+$octopart = REST::Client->new({
         host => 'http://octopart.com',
-        'pretty_print' => 'true',
+#        'pretty_print' => 'true',
     });
 
 foreach (@mpn)
 {
     @Category_UIDS = ();
     %Category_UIDS_hash = (); # no dups in hash keys
-    my @Categories = (); # Text 
+    @Categories = (); # Text 
     %Categories_hash = (); # Text  # no dups in hash keys 
     @Descriptions = ();
     %Descriptions_hash = (); # no dups in hash keys
@@ -194,11 +234,23 @@ foreach (@mpn)
     %Short_Descriptions_hash = (); # no dups in hash keys
     @Specifications = ();
     %Specifications_hash = (); # no dups in hash keys
+    @Manufacturers = (); # Collect all manufacturers
+    %Manufacturers_hash = ();  # no dups in hash keys
+    @Manufacturers_pn = (); # Collect all mpns
+    %Manufacturers_pn_hash = ();  # no dups in hash keys
+    @Vendors = (); # Collect all vendors
+    %Vendors_hash = (); # no dups in hash keys
+    @Vendors_pn = (); # Collect all vendors part numbers
+    %Vendors_pn_hash = (); # no dups in hash keys
     %GSvalues = (); # Init for next spreadsheet row
+    @Pricing = (); # pricing array
+    
     print "\nRequest information on: $_\n" if $verbose;
-    getPart($_); # Get the information
-#    sleep(0.5); # Avoid Octopart rate limit (in msec)
+    getPart($_); # Get the part information
 }
+
+map {print "sorted all categories: $_, UID $AllCatagories{$_}\n"} sort keys %AllCatagories; # Dump  all categories found for all parts
+
 print "\n*********************************** end program $0  program.***********************************\n";
 
 #____________________________________________________________
@@ -224,7 +276,7 @@ sub getPart
     }
 #    print "---Part Time elapsed in sec: ", gettimeofday() - $prev_tod, "\n";
     $prev_tod = $tod;
-    
+    # Make call to Octopart API
     $octopart->GET('/api/v3/parts/match'
                     . '?' . 'apikey=4ed77e1e'
                     . '&' . "queries=[{\"mpn\":\"$part\"}]"
@@ -244,7 +296,6 @@ sub getPart
         if($rc == 429) # Hit rate limit of 3 requests per second
         {
             print " Hit rate limit!";
- #           sleep(1);
         }
         print "\n";
     }
@@ -329,6 +380,7 @@ sub getPart
     my $Part = $PartsMatchResult->[0]->{"items"};
     printResult("Number in items (parts) array: ", scalar @{$Part}) if $verbose;
 
+    # Can we find item, manufacturer (Brand) with most information?
     if($Part)
     {
         for (my $i=0; $i < scalar @{$Part} ;$i++)
@@ -345,11 +397,6 @@ sub getPart
         @Category_UIDS = sort keys %Category_UIDS_hash;
     }
     
-#    foreach my $cate (@Category_UIDS)
-#    {
-#        getCategory($json, $cate)
-#    }
-    
     map {getCategory($json, $_)} @Category_UIDS;
 
     # only call getCategory once
@@ -362,10 +409,11 @@ sub getPart
         # Hash slices explained
         # http://www.webquills.net/web-development/perl/perl-5-hash-slices-can-replace.html
 
-    if (@Categories) # print information if there are @Categories
+    if (scalar @Categories) # print information if there are @Categories
     {
         # Create hash to get rid of dups
         @Categories_hash{@Categories} = (); # use hash keys to get rid of dups
+#        @AllCategories{@Categories} = (); # Save up all categories for end
         print "\nNumber of Sorted hash Categories: ", scalar keys %Categories_hash, "\n" if $verbose;
         map {print "all sorted hash categories: $_\n"} sort keys %Categories_hash; # if $verbose;
     }
@@ -394,6 +442,38 @@ sub getPart
         map {print "all sorted hash short desc: $_\n" if $_} sort keys %Short_Descriptions_hash if $verbose;
     }
     #____________________________
+    if (scalar @Manufacturers)
+    {
+        # User hash to get rid of dups
+        @Manufacturers_hash{@Manufacturers} = ();
+        print "\nNumber of Sorted hash Manufacturer: ", scalar keys %Manufacturers_hash, "\n" if $verbose;
+        map {print "all sorted hash manufacturer: $_\n" if $_} sort keys %Manufacturers_hash if $verbose;
+    }
+    #____________________________
+    if (scalar @Manufacturers_pn)
+    {
+        # User hash to get rid of dups
+        @Manufacturers_pn_hash{@Manufacturers_pn} = ();
+        print "\nNumber of Sorted hash Manufacturer pn: ", scalar keys %Manufacturers_pn_hash, "\n" if $verbose;
+        map {print "all sorted hash manufacturer pn: $_\n" if $_} sort keys %Manufacturers_pn_hash if $verbose;
+    }
+    #____________________________
+    if (scalar @Vendors)
+    {
+        # User hash to get rid of dups
+        @Vendors_hash{@Vendors} = ();
+        print "\nNumber of sorted hash vendors: ", scalar keys %Vendors_hash, "\n" if $verbose;
+        map {print "all sorted hash vendors: $_\n" if $_} sort keys %Vendors_hash if $verbose;
+    }
+    #____________________________
+    if (scalar @Vendors_pn)
+    {
+        # User hash to get rid of dups
+        @Vendors_pn_hash{@Vendors_pn} = ();
+        print "\nNumber of sorted hash vendors pn: ", scalar keys %Vendors_pn_hash, "\n" if $verbose;
+        map {print "all sorted hash vendors pn: $_\n" if $_} sort keys %Vendors_pn_hash if $verbose;
+    }
+    #____________________________
     
     # Fill in items from $inpStr - location, location 2, qty
     # Location	Location_2	Quantity
@@ -403,24 +483,28 @@ sub getPart
         return;
     }
     
+    # Fill in items we found from the API
+    
+    
+    
     # Fill in items that are already known for the part, 
     # such as location and quantity, in their respective columns
     my @partRow = @{$partLoc{$part}};
-#    $GSvalues{'Search'} = $part;
-#    $GSvalues{'*Item Searched'} = $part;
-#    $GSvalues{'Item'} =  $partRow[$headerNameIndex{'Item'}];
-#    $GSvalues{'Location'} =  $partRow[$headerNameIndex{'Location'}];
-#    $GSvalues{'Location 2'} =  $partRow[$headerNameIndex{'Location 2'}];
-#    $GSvalues{'Quantity'} =  $partRow[$headerNameIndex{'Quantity'}];
+    $GSvalues{'Search'} = $part;
+    $GSvalues{'*Item Searched'} = $part;
+    $GSvalues{'Item'} =  $partRow[$headerNameIndex{'Item'}];
+    $GSvalues{'Location'} =  $partRow[$headerNameIndex{'Location'}];
+    $GSvalues{'Location 2'} =  $partRow[$headerNameIndex{'Location 2'}];
+    $GSvalues{'Quantity'} =  $partRow[$headerNameIndex{'Quantity'}];
     
-    %GSvalues = (
-        Search => $part,
-        '*Item Searched' => $part,
-        Item => $partRow[$headerNameIndex{'Item'}],
-        Location => $partRow[$headerNameIndex{'Location'}],
-        'Location 2' => $partRow[$headerNameIndex{'Location 2'}],
-        Quantity => $partRow[$headerNameIndex{'Quantity'}],
-    );
+#    %GSvalues = (
+#        Search => $part,
+#        '*Item Searched' => $part,
+#        Item => $partRow[$headerNameIndex{'Item'}],
+#        Location => $partRow[$headerNameIndex{'Location'}],
+#        'Location 2' => $partRow[$headerNameIndex{'Location 2'}],
+#        Quantity => $partRow[$headerNameIndex{'Quantity'}],
+#    );
       
     print "Spreadsheet Columns\n" if $verbose;
 
@@ -436,11 +520,13 @@ sub getPart
 } # getPart
 
 # Ask Octopart for category information
+# Pass UID and fetch Category
 sub getCategory
 {
     my ($json, $c) = @_;
 #    sleep(0.5);
 #    select(undef,undef,undef, 0.5); # sleep - can be for less than 1 sec
+    my $catName; # category name
     $tod = gettimeofday();   
     my $elapsedtime = $tod - $prev_tod;
 
@@ -454,29 +540,49 @@ sub getCategory
     }
 #    print "---Category Time elapsed in sec: ", gettimeofday() - $prev_tod, "\n";
     $prev_tod = $tod;
-    $octopart->GET("/api/v3/categories/$c"
-                    . '?' . 'apikey=4ed77e1e');
-                    
-# Eventually try multi get categories                    
-# GET /categories/get_multi - Fetch multiple categories simultaneously
 
-    my $rc = $octopart->responseCode();
-    unless ($rc == 200){
-        print "*======== HTTP request category responseCode: ", $octopart->responseCode(), " Category: ", $c;
-        if($rc == 429) # Hit rate limit of 3 requests per second
+    # Fine out if category uid is already known in %AllInputCategories
+    if  (exists $AllInputCategories{$c})
+    {
+        $catName = $AllInputCategories{$c};
+    } else # If not fetch from api
+    {
+        $octopart->GET("/api/v3/categories/$c"
+                        . '?' . 'apikey=4ed77e1e');
+
+    # Eventually try multi get categories                    
+    # GET /categories/get_multi - Fetch multiple categories simultaneously
+
+        my $rc = $octopart->responseCode();
+        unless ($rc == 200)
         {
-            print " Hit rate limit!";
-#            sleep(1);
+            print "*======== HTTP request category responseCode: ", $octopart->responseCode(), " Category: ", $c;
+            if($rc == 429) # Hit rate limit of 3 requests per second
+            {
+                print " Hit rate limit!";
+    #            sleep(1);
+            }
+            print "\n";
         }
-        print "\n";
-    }
-
         my $Category = $json->decode($octopart->responseContent());
- #       print "category UID: $c, name: ", $Category->{'name'}, "\n";
-        push @Categories, $Category->{'name'} if $Category->{'name'};
+        $catName = $Category->{'name'};
+            
+        # Save category and UID, only if retrieved for first time.
+#        $AllCatagories{$Category->{'name'}} = $c if $Category->{'name'};
+        $AllCatagories{$catName} = $c if $catName;
+            
+    } # end else If not fetch from api
+    
+#        print "category UID: $c, name: ", $Category->{'name'}, "\n";
+#        push @Categories, $Category->{'name'} if $Category->{'name'};
+        push @Categories, $catName if $catName;
+        
+        # Save category and UID
+#        $AllCatagories{$Category->{'name'}} = $c if $Category->{'name'};
+#        $AllCatagories{$catName} = $c if $catName;
         
         # Sample category data structure
- #       {"ancestor_names": ["Electronic Parts", "Passive Components", "Resistors"], "uid": "91ee5ce4a8204a29", "num_parts": 708565, "ancestor_uids": ["8a1e4714bb3951d9", "7542b8484461ae85", "5c6a91606d4187ad"], "children_uids": [], "__class__": "Category", "parent_uid": "5c6a91606d4187ad", "name": "Through-Hole Resistors"}      
+#       {"ancestor_names": ["Electronic Parts", "Passive Components", "Resistors"], "uid": "91ee5ce4a8204a29", "num_parts": 708565, "ancestor_uids": ["8a1e4714bb3951d9", "7542b8484461ae85", "5c6a91606d4187ad"], "children_uids": [], "__class__": "Category", "parent_uid": "5c6a91606d4187ad", "name": "Through-Hole Resistors"}      
 } # sub getCategory
 
 # Get item (parts) information
@@ -522,6 +628,7 @@ sub getItems
     
     printResult("items $_ class: ", $Part->[$_]->{'__class__'}) if $verbose;
     printResult("items $_ mpn: ", $Part->[$_]->{'mpn'}) if $verbose;
+    push @Manufacturers_pn, $Part->[$_]->{'mpn'} if $Part->[$_]->{'mpn'};
     printResult("items $_ short desc: ", $Part->[$_]->{'short_description'}) if $verbose;
     push @Short_Descriptions, $Part->[$_]->{'short_description'} if $Part->[$_]->{'short_description'};
     
@@ -548,7 +655,7 @@ sub getItems
     # Manufacturer Object - manufacturer
     my $Manufacturer = $Part->[$_]->{'manufacturer'};
     printResult("Mfg display name: ", $Manufacturer->{'name'}) if $verbose;
-    
+    push @Manufacturers, $Manufacturer->{'name'} if $Manufacturer->{'name'};
 #SCHEMA        Description schema:
 #SCHEMA        Property	    Description	                        Example	                            Empty Value
 #SCHEMA        value	    The value of the description	    "The TLC274AID is a precision ..."	n/a
@@ -556,19 +663,46 @@ sub getItems
     
     # Description Object - descriptions
     my $Description = $Part->[$_]->{'descriptions'};
+    map {
+            push @Descriptions, $_->{'value'}; 
+        } @$Description if $verbose;
+    my $descriptionToUse = $Descriptions[0]; # Grab one of the descriptions
+    my $shortDescriptionToUse = $Part->[$_]->{'short_description'};
     
     printResult("number of descriptions: ", scalar @$Description) if $verbose;
     map {printResult("    Description: ", $_->{'value'});
-         push @Descriptions, $_->{'value'}; 
+#         push @Descriptions, $_->{'value'}; 
         } @$Description if $verbose;
 
+#   unless ($_) # use only the first mfg part values for now
     unless ($_) # use only the first mfg part values for now
     {
-        %GSvalues = ( Item =>  $Part->[$_]->{'mpn'},
-                        MPN => $Part->[$_]->{'mpn'},
-                        Manufacturer => $Manufacturer->{'name'},
-                        Description => $Part->[$_]->{'short_description'},
-                    );
+#        %GSvalues = ( Item =>  $Part->[$_]->{'mpn'},
+#                        MPN => $Part->[$_]->{'mpn'},
+#                        Manufacturer => $Manufacturer->{'name'},
+#                        Description => $Part->[$_]->{'short_description'},
+#                    );
+                    
+        $GSvalues{'Item'} = $Part->[$_]->{'mpn'};
+        $GSvalues{'MPN'} = $Part->[$_]->{'mpn'};
+        $GSvalues{'Manufacturer'} = Manufacturer => $Manufacturer->{'name'};
+        
+        # if description array, use one of them
+        # if not use short description if there is one
+        
+#        $GSvalues{'Description'} = $Part->[$_]->{'short_description'};
+    if($descriptionToUse)
+    {
+        $GSvalues{'Description'} = $descriptionToUse;
+    } elsif($shortDescriptionToUse)
+    {
+        $GSvalues{'Description'} = $shortDescriptionToUse;
+    } else
+    {
+        $GSvalues{'Description'} = 'Description na';
+    }
+#        $GSvalues{'Description'} = $Part->[$_]->{'short_description'};
+        
     } # unless ($_)
     
     
@@ -643,7 +777,8 @@ sub getItems
     foreach my $o (@$Offers)
     {      
         my $seller = $o->{'seller'}; # get seller object
-        
+        push @Vendors, $seller->{'name'} if $seller->{'name'}; # Save seller name
+        push @Vendors_pn, $o->{'sku'} if $o->{'sku'}; # Save the seller part number
 #SCHEMA        Seller schema:
 #SCHEMA        Property	        Description	                    Example	                 Empty Value
 #SCHEMA        uid	            64-bit unique identifier	    "4a258f2f6a2199e2"	     n/a
@@ -659,7 +794,8 @@ sub getItems
             }
         print "           Seller: ", $seller->{'name'} if $verbose;
         print ", PartOffer sku: ", $o->{'sku'}, "\n" if $verbose;
-        unless ($_) # use only the first mfg part values for now
+#        unless ($_) # use only the first mfg part values for now
+        if (/mouser/i) # use only the first mfg part values for now
         {
             $GSvalues{'Vendor'} = $seller->{'name'};
             $GSvalues{'Vendor_PN'} =  $o->{'sku'};
@@ -671,6 +807,7 @@ sub getItems
             my $qty1 = $prices->[0]; # first element of the price array is the 
                                      # min quantity
             print "            quantity: ", $qty1->[0], ", price: ", $qty1->[1], "\n" if $verbose;
+            push @Pricing, $prices; # put info in @Pricing array - array of [qty, price] information
         } 
     }   # foreach my $o (@$Offers)
 } # sub getItems
@@ -681,33 +818,3 @@ sub printResult
     my ($str, $tmp) = @_;
     print $str, $tmp?$tmp:'NULL', "\n";
 } # sub printResult
-
-#    Class	Type1 for each Class								
-#    ADAPTER	AC-MAINS								
-#    BAT	LITHIUM								
-#    CAP	AL	CERAMIC	FILM						
-#    CBL	RIBBON-JUMPER								
-#    CON	F:BARREL								
-#    DIODE	RECTIFIER	SCHOTTKY	LASER	SIGNAL	ZENER				
-#    DISP	OLED								
-#    ELEC-MECH	BATT-HOLDER								
-#    HDR	SHROUDED	SOCKET	UNSHROUDED						
-#    HS	DISCRETE								
-#    IC	LOGIC	MCU	OPAMP	REFERENCE	REGULATOR				
-#    IND	FIXED								
-#    LED	AMBR	YLW	GRN	IR	RED	WHT			
-#    MIC	ELECTRET								
-#    MODULE	ARDUINO								
-#    MOTOR	LEGO-M								
-#    PCB	LaserRcvr_Boost_board_v1.2	LaserRcvr_Output_board_v1.2	LedFob_r2d	Nano-CC-EL-ver-0.62	simple_ps_1v0			
-#    PROTOTYPING	BREADBOARD WIRE KIT	SOLDERLESS BREADBOARD							
-#    PS	AC								
-#    RES	F (thin film)	TF (thick film)	CF (carbon film)	CdS	POT				
-#    SOCKET	DIP								
-#    SPKR	MAGNETIC								
-#    SW	BIN-ENCODER	MOMENTARY	MULTI-DIRECTIONAL	SPDT					
-#    TERM-BLCK	SCREW								
-#    TRANS	BJT	MOSFET							
-#    WIRE	MAGNET								
-#    XFRMR	LF (line freq)	SMF (switch-mode freq)	RF						
-#    HWR	STANDOFF

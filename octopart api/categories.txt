@@ -37,3 +37,4 @@ sorted all categories: Variable Resistors and Potentiometers, UID cda900a3fc9b16
 sorted all categories: Voltage References, UID 05f7c8fd3444de30
 sorted all categories: Voltage Regulators - Linear, UID bad177db8b576116
 sorted all categories: Zener Diodes, UID d1b41cbee0af0a73
+sorted all categories: Connectors , UID 75fab8f04590ae3d

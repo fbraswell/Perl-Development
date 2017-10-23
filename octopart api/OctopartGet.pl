@@ -93,6 +93,7 @@ my @Vendors_pn = (); # Collect all vendors part numbers
 my %Vendors_pn_hash = (); # no dups in hash keys
 my @Pricing = (); # array of [qty, price] information 
 my $requestedPN;
+my $part; # current part number
 
 print "\n*********************************** start program $0 program.***********************************\n";
 # Part numbers go here
@@ -247,17 +248,18 @@ foreach (@mpn)
     
     print "\nRequest information on: $_\n" if $verbose;
     getPart($_); # Get the part information
+    buildRow(); # get all GSvalues and output row
 }
 
 map {print "sorted all categories: $_, UID $AllCatagories{$_}\n"} sort keys %AllCatagories; # Dump  all categories found for all parts
 
 print "\n*********************************** end program $0  program.***********************************\n";
 
-#____________________________________________________________
-
+#___________________________________________________________________________
 sub getPart
 {
-    my $part = shift;   # Get part name
+#    my $part = shift;   # Get part name
+     $part = shift;   # Get part name
 #    sleep(0.95); # Avoid Octopart rate limit (in msec) - no effect
 #    $tod = gettimeofday();
 #    print "---Time elapsed in msec: ", $tod - $prev_tod, "\n";
@@ -397,10 +399,10 @@ sub getPart
         @Category_UIDS = sort keys %Category_UIDS_hash;
     }
     
-    map {getCategory($json, $_)} @Category_UIDS;
+    map {getCategory($json, $_)} @Category_UIDS; # Get all categories for this part
 
     # only call getCategory once
-    getCategory($json, $Category_UIDS[0]) if ($Category_UIDS[0]);
+#    getCategory($json, $Category_UIDS[0]) if ($Category_UIDS[0]);
     $GSvalues{'Category'} =  $Categories[0] if $Categories[0];
 
     #____________________________    
@@ -415,7 +417,7 @@ sub getPart
         @Categories_hash{@Categories} = (); # use hash keys to get rid of dups
 #        @AllCategories{@Categories} = (); # Save up all categories for end
         print "\nNumber of Sorted hash Categories: ", scalar keys %Categories_hash, "\n" if $verbose;
-        map {print "all sorted hash categories: $_\n"} sort keys %Categories_hash; # if $verbose;
+        map {print "all sorted hash categories: $_\n"} sort keys %Categories_hash if $verbose;
     }
     #____________________________
     if (scalar @Specifications) # print information if there are @Specifications
@@ -482,9 +484,14 @@ sub getPart
         print "WARNING: This part: $part, doesn't exist in the hash.\n";
         return;
     }
-    
+} # getPart
+#___________________________________________________________________________
+sub buildRow
+{
     # Fill in items we found from the API
-    
+    # Column names below
+    # Value, *Item Searched, Item, Description, MPN, Manufacturer, Vendor PN, Vendor, , , , , 
+    # Category, Type, Location, Location 2, Quantity, Search, , 
     
     
     # Fill in items that are already known for the part, 
@@ -505,20 +512,51 @@ sub getPart
 #        'Location 2' => $partRow[$headerNameIndex{'Location 2'}],
 #        Quantity => $partRow[$headerNameIndex{'Quantity'}],
 #    );
-      
+
+    # Add categories by concatenating all found categories for this part
+    my $concat = '';
+    map {$concat .= "$_, "}  @Categories if $Categories[0];
+    chop $concat; # Get rid of final space at the end
+    chop $concat; # Get rid of final , at the end
+    $GSvalues{'Category'} = $concat;
+    
+    # Vendor & Vendor PN
+    # @Vendors and @Vendors_pn match for each index
+    # @Pricing # also matching, info in @Pricing array - array of [qty, price] information
+    # At this time look for Mouser
+    my $i=0;
+    foreach (@Vendors)
+    {
+        if (/Mouser/) # Search for Mouser
+        {
+            $GSvalues{'Vendor'} = $Vendors[$i];
+            $GSvalues{'Vendor PN'} = $Vendors_pn[$i];
+        }
+        $i++; # next index
+    }
+    
+    # Manufacturer & Manufacturer PN
+    # @Manufacturers and @Manufacturers_pn match for each index
+    # Grab the first Manufacturer Found for now
+    $GSvalues{'Manufacturer'} = $Manufacturers[0] if $Manufacturers[0];
+    $GSvalues{'MPN'} = $Manufacturers_pn[0] if $Manufacturers_pn[0];
+    
     print "Spreadsheet Columns\n" if $verbose;
 
         # Print the spreadsheet columns with hash keys from header labels
     print "$partCount *==>";
     $partCount++;
+    
+    # Print the spreadsheet columns for each of the column names
+    # If nothing defined in the column print naO
         # Comma separated
  #   map {defined $GSvalues{$_}?print "$GSvalues{$_}, ": print "na, " } @GSheaders;
         # Tab separated
     map {defined $GSvalues{$_}?print "$GSvalues{$_}\t": print "naO\t" } @GSheaders;
     print "\n";
     
-} # getPart
-
+} # buildRow
+#___________________________________________________________________________
 # Ask Octopart for category information
 # Pass UID and fetch Category
 sub getCategory
@@ -584,7 +622,7 @@ sub getCategory
         # Sample category data structure
 #       {"ancestor_names": ["Electronic Parts", "Passive Components", "Resistors"], "uid": "91ee5ce4a8204a29", "num_parts": 708565, "ancestor_uids": ["8a1e4714bb3951d9", "7542b8484461ae85", "5c6a91606d4187ad"], "children_uids": [], "__class__": "Category", "parent_uid": "5c6a91606d4187ad", "name": "Through-Hole Resistors"}      
 } # sub getCategory
-
+#___________________________________________________________________________
 # Get item (parts) information
 sub getItems
 {
@@ -683,9 +721,9 @@ sub getItems
 #                        Description => $Part->[$_]->{'short_description'},
 #                    );
                     
-        $GSvalues{'Item'} = $Part->[$_]->{'mpn'};
-        $GSvalues{'MPN'} = $Part->[$_]->{'mpn'};
-        $GSvalues{'Manufacturer'} = Manufacturer => $Manufacturer->{'name'};
+#        $GSvalues{'Item'} = $Part->[$_]->{'mpn'};
+#        $GSvalues{'MPN'} = $Part->[$_]->{'mpn'};
+#        $GSvalues{'Manufacturer'} = $Manufacturer->{'name'};
         
         # if description array, use one of them
         # if not use short description if there is one
@@ -795,11 +833,11 @@ sub getItems
         print "           Seller: ", $seller->{'name'} if $verbose;
         print ", PartOffer sku: ", $o->{'sku'}, "\n" if $verbose;
 #        unless ($_) # use only the first mfg part values for now
-        if (/mouser/i) # use only the first mfg part values for now
-        {
-            $GSvalues{'Vendor'} = $seller->{'name'};
-            $GSvalues{'Vendor_PN'} =  $o->{'sku'};
-        } # unless ($_)
+#        if (/mouser/i) # use only the first mfg part values for now
+#        {
+#            $GSvalues{'Vendor'} = $seller->{'name'};
+#            $GSvalues{'Vendor_PN'} =  $o->{'sku'};
+#        } # unless ($_)
         
         my $prices = $o->{'prices'}->{'USD'};
         if($prices) # Are there prices in USD?
